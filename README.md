@@ -20,11 +20,11 @@ const Match = require("./index");
 const match = new Match();
 
 match({ name: "home" })
-	.onMatch("myhome", "not my home")
- 	.onMatch("hishome", "not his home")
-	.onMatch("home", "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .onMatch("myhome", "not my home")
+  .onMatch("hishome", "not his home")
+  .onMatch("home", "just home")
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 ``` 
 
 The example above show case a pattern similar to javascript "switch", with the exception that SwitchCase allows user to pass variable as second argument of each cases and write the logic at the end of all evaluations.
