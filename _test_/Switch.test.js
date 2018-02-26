@@ -1,5 +1,4 @@
 import SwitchCase from "../src/Switch";
-import Match from "../src/Match";
 
 describe("test native methods of SwitchCase", () => {
   let caseSwitch;
@@ -11,31 +10,31 @@ describe("test native methods of SwitchCase", () => {
   test("static, single input/value should return bool", () => {
     caseSwitch
       .setMatchingTargets({ name: "skills" })
-      .onMatch([`name === "skills"`], "It's skills")
-      .onMatch([`name === "home"`], "It's home")
+      .findMatch([`name === "skills"`], "It's skills", null, "SIMPLE")
+      .findMatch([`name === "home"`], "It's home", null, "SIMPLE")
 			.onEnd((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
   test("setting string instead of array as condition in simple match should be valid", () => {
     caseSwitch
       .setMatchingTargets({ name: "skills" })
-      .onMatch(`name === "skills"`, "It's skills")
+      .findMatch(`name === "skills"`, "It's skills", null, "SIMPLE")
 			.onEnd((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
   test("if setMatchingTargets takes in null or types other than object literal, should throw error", () => {
     caseSwitch
       .setMatchingTargets()
-      .onMatch([`name === "skills"`], "It's skills")
-      .onMatch([`name === "home"`], "It's home")
+      .findMatch([`name === "skills"`], "It's skills", null, "SIMPLE")
+      .findMatch([`name === "home"`], "It's home", null, "SIMPLE")
 			.onEnd((debug, vals) => expect(vals).toBe(null));
   });
 
   test("if input name is the same as the literal condition name, if value matched should return true", () => {
     caseSwitch
       .setMatchingTargets({ home: "home" })
-      .onMatch([`home === "skills"`], "It's skills")
-      .onMatch([`home === "home"`], "It's home")
+      .findMatch([`home === "skills"`], "It's skills", null, "SIMPLE")
+      .findMatch([`home === "home"`], "It's home", null, "SIMPLE")
 			.onEnd((debug, vals) => expect(vals).toBe("It's home"));
   });
 
@@ -47,14 +46,14 @@ describe("test native methods of SwitchCase", () => {
 
     caseSwitch
       .setMatchingTargets(params)
-      .onMatch([`winScrollY < winHeight - 200`], "case 1 is true")
+      .findMatch([`winScrollY < winHeight - 200`], "case 1 is true", null, "SIMPLE")
       .otherwise("I lied it's false")
       .onEnd((debug, vals) => expect(vals).toBe("I lied it's false"));
 
     params.winHeight = 200;
     caseSwitch
       .setMatchingTargets(params)
-      .onMatchOR([`winScrollY < winHeight - 200`, `winScrollY > winHeight - 200`], "case 1 is true")
+      .findMatch([`winScrollY < winHeight - 200`, `winScrollY > winHeight - 200`], "case 1 is true", null, "OR")
       .otherwise("I lied it's false")
       .onEnd((debug, vals) => expect(vals).toBe("case 1 is true"));
 
@@ -68,12 +67,12 @@ describe("test native methods of SwitchCase", () => {
 
 		caseSwitch
       .setMatchingTargets({ name: "skills" })
-      .onMatch(`'name' === "skills"`, true)
+      .findMatch(`'name' === "skills"`, true, null, "SIMPLE")
       .onEnd((debug, results) => expect(results).toBeFalsy());
 
     caseSwitch
       .setMatchingTargets(params)
-      .onMatch(`winScrollY < 'winHeight' - 200`, true)
+      .findMatch(`winScrollY < 'winHeight' - 200`, true, null, "SIMPLE")
       .onEnd((debug, results) => expect(results).toBeFalsy());
   });
 
@@ -82,32 +81,22 @@ describe("test native methods of SwitchCase", () => {
   	const resultOfMatch = 
   	caseSwitch
       .setMatchingTargets({ name })
-      .onMatch(`name === "skills"`, "It's skills")
-      .onMatch(`name === "about"`, "It's about")
-      .onMatch(`name === "home"`, "It's home")
-      .onEnd((debug, result) => {
-      	console.log(result);
-      	return result;
-      });
+      .findMatch(`name === "skills"`, "It's skills", null, "SIMPLE")
+      .findMatch(`name === "about"`, "It's about", null, "SIMPLE")
+      .findMatch(`name === "home"`, "It's home", null, "SIMPLE")
+      .onEnd((debug, result) => result);
 
    	expect(resultOfMatch).toBe("It's home");
-  })
+  });
+
+  test("findMatch also accepts function as first argument", () => {
+    const name = "home";
+    const exp = name => name === "home";
+
+    caseSwitch
+      .setMatchingTargets({ name })
+      .findMatch(exp, "It's home", null, "SIMPLE")
+      .otherwise("It's something else")
+      .onEnd((debug, result) => expect(result).toBe("It's home"));
+  });
 });
-
-describe("test Match, a wrapper of SwitchCase", () => {
-
-	test("the Match wrapper will return an instance of SwitchCase", () => {
-		const match = Match();
-		expect(typeof match).toBe("function");
-	});	
-
-	test("Match can pass in arguments after instanciation", () => {
-		const match = Match();
-		
-		match({ name: "home" })
-			.onMatch("name === 'home'", "It's true!!")
-			.otherwise("It's false")
-			.onEnd((debug, result) => expect(result).toBe("It's true!!"));
-	});
-
-})

@@ -27,26 +27,26 @@ class SwitchCase {
     }
     return this;
   }
-  
-  // interfaces can be extracted from object, and defined as 
-  // wrapper methods
-  onMatch(singleExp, values, fn) {
-    this._findMatch(singleExp, values, fn, "SIMPLE");
-    return this;
-  }
 
-  onMatchOR(expressions, values, fn) {
-    this._findMatch(expressions, values, fn, "OR");
-    return this;
-  }
-
-  onMatchAND(expressions, values, fn) {
-    this._findMatch(expressions, values, fn, "OR");
+  findMatch(exp, values, fn, flag) {
+    [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
+    const cond = this._setConditions(exp);
+    const methods = {
+      OR: "_evaluateOR",
+      AND: "_evaluateAND",
+      SIMPLE: "_evaluateSingleCase",
+    };
+    
+    const matching = flag === "SIMPLE" 
+      ? this[ methods[flag] ](cond.get(0)) 
+      : this[ methods[flag] ](cond);
+    
+    matching && this._break(values, fn);
     return this;
   }
 
   otherwise(values, fn) {
-    this._findMatch("true", values, fn, "SIMPLE");
+    this.findMatch("true", values, fn, "SIMPLE");
     return this;
   }
 
@@ -63,23 +63,8 @@ class SwitchCase {
     return true;
   }
 
-  _findMatch(exp, values, fn, flag) {
-    [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
-    const cond = this._setConditions(exp);
-    const methods = {
-      OR: "_evaluateOR",
-      AND: "_evaluateAND",
-      SIMPLE: "_evaluateSingleCase",
-    };
-    
-    const matching = flag === "SIMPLE" 
-      ? this[ methods[flag] ](cond.get(0)) 
-      : this[ methods[flag] ](cond);
-    return matching ? this._break(values, fn) : false;
-  }
-
   _setConditions(cases) {
-    if (typeof cases === "string") {
+    if (!Array.isArray(cases)) {
       cases = [ cases ];
     }
     const conditions = new Map();
@@ -132,7 +117,11 @@ class SwitchCase {
         values.push(elem[1]);
       });
 
-    return new Function(...args, expression)(...values);
+    const functionExp = typeof condition === "function" 
+      ? condition 
+      : new Function(...args, expression);
+
+    return functionExp(...values);
   }
 }
 
