@@ -8,8 +8,8 @@ class SwitchCase {
     return this.matched;
   }
 
-  set isMatched(boolean) {
-    this.matched = boolean;
+  set isMatched(bool) {
+    this.matched = bool;
   }
 
   set testTargets(targetObj) {
@@ -28,15 +28,19 @@ class SwitchCase {
     return this;
   }
 
+  // @ findMatch is the native interface of SwitchCase
+  // might need to implement stricter check for errors (not really if user only use Match's interface)
   findMatch(exp, values, fn, flag) {
+    [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
     [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
+
     const cond = this._setConditions(exp);
     const methods = {
       OR: "_evaluateOR",
       AND: "_evaluateAND",
       SIMPLE: "_evaluateSingleCase",
     };
-    
+
     const matching = flag === "SIMPLE" 
       ? this[ methods[flag] ](cond.get(0)) 
       : this[ methods[flag] ](cond);

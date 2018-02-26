@@ -19,6 +19,7 @@ function Match(config) {
 		  // wrapper methods
 		  _init(isSimple) {
 		  	// passing argIsSimple to watch for single string evaluation
+		  	// init should be a config method to flag different behavior of the function
 		  	this.simpleExp = true;
 		  	return this;
 		  }
@@ -52,16 +53,13 @@ function Match(config) {
 		  		expression = [ expression ];
 		  	}
 
-		  	const len = expression.length;
 				const name = Object.entries(this.testTargets)[0][0];
 				const mapping = expr => {
-					const simple = expr.match(/^\b\w+\b$/g); 
-					const verbose = `${name} === "${simple}"`;
-					return simple ? verbose : expr;
+					const simple = expr.toString().match(/^\b\w+\b$/); 
+					return simple ? `${name} === "${simple}"` : expr;
 		  	};
 
-		  	const newExp = expression.map(mapping);
-		  	return newExp;
+		  	return expression.map(mapping);
 		  }
 		}
 
