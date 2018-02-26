@@ -99,7 +99,7 @@ match({ home: "home" })
   .onMatchOR(["halla", "hishome"], "case 1 is true")
   .onMatchOR(["home", "skills", "about"], "case 2 is true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log(result)); // "case 2 is true"
+  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
 // matching multiple variables to expression is also supported by this method
 // note that by passing more than one variable to evaluate, simple name-value is not supported
@@ -107,12 +107,12 @@ match({ home: "home", name: "71emj" })
   .onMatchOR(["home === 'halla'", "name === 'hishome'"], "case 1 is true")
   .onMatchOR(["home === 'skills'", "name === '71emj'"], "case 2 is true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log(result)); // "case 2 is true"
+  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
 // the use case of onMatchOR can be extended to mathematical evaluations
 match({ num1: 1000, num2: 2000 })
   .onMatchOR(["num1 + 200 > num2", "num1 * 2 < num2"], "case 1 is true")
   .onMatchOR(["num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2"], "case 2 is true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log(result)); // "case 2 is true"
+  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 ```
