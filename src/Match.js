@@ -4,7 +4,8 @@ function Match(config) {
 	"use strict";
 	// Match should take in a config object 
 	// and return an wrapper function for minimal interface 	
-	// @ SwitchCase.onMatch? should be a part of the wrapper
+	// @ Wrapper provides interface to utilize full power of the SwitchCase
+	// such as interpreting simple expression to more verbose (accepted format of SwitchCase) expression 
 
 	function Wrapper(args) {
 		if (!args) throw new Error("argument cannot be empty");
@@ -23,16 +24,12 @@ function Match(config) {
 		  }
 
 		  onMatch(singleExp, values, fn) {
-		  	const { simpleExp } = this;
-		  	const newExpr = simpleExp ? this._interpret(singleExp) : singleExp;
-		    this.findMatch(newExpr, values, fn, "SIMPLE");
+		    this.findMatch(this._interpret(singleExp), values, fn, "SIMPLE");
 		    return this;
 		  }
 
 		  onMatchOR(expressions, values, fn) {
-				const { simpleExp } = this;
-		  	const newExpr = expressions ? this._interpret(expressions) : expressions;
-		    this.findMatch(newExpr, values, fn, "OR");
+		    this.findMatch(this._interpret(expressions), values, fn, "OR");
 		    return this;
 		  }
 
@@ -41,7 +38,12 @@ function Match(config) {
 		    return this;
 		  }
 
-		  _interpret(expression) {
+		  _interpret(expr) {
+				const { simpleExp } = this;
+		  	return simpleExp ? this._verbose(expr) : expr;
+		  }
+
+		  _verbose(expression) {
 		  	if (typeof expression === "function") {
 		  		return expression;
 		  	} 
