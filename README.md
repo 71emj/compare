@@ -1,7 +1,7 @@
 # SwitchCase
 SwithcCase is a zero-dependency library that evaluates complex case matching; with features supporting evaluations made by passing expression string(s), value string(s), function(s) as "case(s)" as well as end-of-the-evaluation callback and individual match callbacks(optional). 
 
-note on naming in the following doc: the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
+<strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
 ## Features
 * Basic name-value matching similar to switch.
@@ -65,26 +65,26 @@ const match = new Match();
 // this is valid
 match({ name: "home" })
   .onMatch("home", "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 
 // so is this
 match({ name: "home" })
   .onMatch([ "home" ], "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 
 // this will also work, but only the first expression in the array is evaluated
 match({ name: "home" })
   .onMatch([ "home", "name === 'home'" ], "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 
 // this will fail
 match({ name: "home" })
   .onMatch([ "myhome", "home" ], "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "nothing matched"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "nothing matched"
 ```
 
 #### .onMatchOR(expressions, value[, callback])
@@ -99,7 +99,7 @@ match({ home: "home" })
   .onMatchOR(["halla", "hishome"], "case 1 is true")
   .onMatchOR(["home", "skills", "about"], "case 2 is true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log(result)); // "case 2 is true"
+  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
 // matching multiple variables to expression is also supported by this method
 // note that by passing more than one variable to evaluate, simple name-value is not supported
@@ -107,12 +107,12 @@ match({ home: "home", name: "71emj" })
   .onMatchOR(["home === 'halla'", "name === 'hishome'"], "case 1 is true")
   .onMatchOR(["home === 'skills'", "name === '71emj'"], "case 2 is true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log(result)); // "case 2 is true"
+  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
 // the use case of onMatchOR can be extended to mathematical evaluations
 match({ num1: 1000, num2: 2000 })
   .onMatchOR(["num1 + 200 > num2", "num1 * 2 < num2"], "case 1 is true")
   .onMatchOR(["num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2"], "case 2 is true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log(result)); // "case 2 is true"
+  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 ```
