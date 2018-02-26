@@ -1,0 +1,32 @@
+{
+  "name": "switch-case",
+  "version": "0.1.0",
+  "description": "A javascript library for alternative switch",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/71emj/SwitchCase.git"
+  },
+  "author": "71emj",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/71emj/SwitchCase/issues"
+  },
+  "homepage": "https://github.com/71emj/SwitchCase#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-jest": "^22.4.1",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-react": "^6.24.1",
+    "flow": "^0.2.3",
+    "jest": "^22.4.2",
+    "jest-cli": "^22.4.2"
+  },
+  "dependencies": {
+    "lodash": "^4.17.5"
+  }
+}
