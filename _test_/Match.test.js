@@ -30,7 +30,7 @@ describe("test Match, a wrapper of SwitchCase", () => {
 		match({ home: "home" })
 			.onMatch("myhome", "not true")
 			.onMatch(exp, "also not true")
-			.onMatch("home", "true")
+			.onMatch([ "skill", "home" ], "true") // this won't match
 			.otherwise("nothing here")
 			.onEnd((debug, result) => expect(result).toBe("also not true"));
 
