@@ -1,7 +1,7 @@
 # SwitchCase
 SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing statement in the form of string(s), array, and function as "case(s)" as well as end-of-the-evaluation callback and individual match callbacks(optional). 
 
-note on naming in the following doc: the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
+<strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
 ## Features
 * Basic name-value matching similar to switch.
@@ -15,7 +15,7 @@ installation via npm or cdn is not currently supported as it is still in develop
 For developers interested in the project can download it via git clone.
 
 ## Examples
-basic example
+Basic example
 
 ``` javascript
 const Match = require("./index");
@@ -53,35 +53,35 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 
 
 ## APIs
-followings are a list of methods for utilizing SwitchCase
+Following contents are a list of methods for utilizing SwitchCase
 
 #### onMatch(statement, value[, callback])
-onMatch is similar to "case" in vanilla switch. The statement can be either a string or an array. However since the onMatch is designed to match one statment in each case, only the first expression in an array will be evaluate in this method (see onMatchOR(), onMatchAND for multiple statement evaluations).
+onMatch is similar to "case" in vanilla switch. The statement can be either a string or an array. However since the onMatch is designed to match one statment in each case, only the first statement in an array is evaluated in this method (see onMatchOR(), onMatchAND for multiple statement evaluation).
 
 ``` javascript
 // this is valid
 match({ name: "home" })
   .onMatch("home", "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 
 // so is this
 match({ name: "home" })
   .onMatch([ "home" ], "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 
 // this will also work, but only the first statement in the array is evaluated
 match({ name: "home" })
   .onMatch([ "home", "name === 'home'" ], "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "just home"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
 
 // this will fail
 match({ name: "home" })
   .onMatch([ "myhome", "home" ], "just home")
-	.otherwise("nothing matched")
-	.onEnd((debug, result) => console.log(result)); // "nothing matched"
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "nothing matched"
 ```
 
 #### onMatchOR(statements, value[, callback])
@@ -109,6 +109,7 @@ match({ num1: 1000, num2: 2000 })
   .onMatchOR(["num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2"], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
+<<<<<<< HEAD
 ```
 
 #### onMatchAND(statements, value[, callback])
@@ -151,7 +152,7 @@ match({ home: null })
 ```
 
 #### onEnd(callback(debug, result))
-onEnd method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, onEnd method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three onMatch* methods should be use instead), in addition to receiving matched case result in callback, optional return can tranform the evaluation chain into an expression.
+onEnd method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, onEnd method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three onMatch* methods should be use instead), in addition to receiving matched case result in callback, optional return can tranform the evaluation chain into an statement.
 
 ``` javascript
 // basic
@@ -186,5 +187,7 @@ const filtering = elem => match({ elem })
   .onEnd((debug, result) => result);
 
 const newArray = array.filter(filtering);
+=======
+>>>>>>> d73917c094774e22f85c261c0e791156f8ae4d21
 ```
 
