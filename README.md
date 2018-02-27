@@ -247,7 +247,7 @@ match(dataObj)
   .onMatch(processData, "something")
   .otherwise("nothing")
   .onEnd((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
-
+```
 
 The order of the variable is in the same order passed into SwitchCase.
 
