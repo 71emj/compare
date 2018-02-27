@@ -1,9 +1,7 @@
 # SwitchCase
 SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual match callbacks(optional). 
 
-<strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
-
-<strong>Important Note: </strong>security feature will be implement in the next interation, where expression can only be a "single-statment" ie. one-semi-column-only. Multi-statement expressions are suggested to be split into separate expression or be constructed into a custom function
+<strong>note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
 ## Features
 * Basic name-value matching similar to switch.
@@ -284,10 +282,36 @@ The core functionality of SwitchCase is to evaluate "expression string(s)", doin
 1. Never use it to evaluate unknown source 
 2. Use function instead of expression string with custom filter
 
-There are however a few security measure implemented into SwitchCase (currently under development).
+There are however a few security measures implemented into SwitchCase.
 
 * Each expression is limited to a single "statement" (so one-semi-column-only)
 * An open-close parenthesis in any part of the string are not allowed
 * Keywords such as "window", "document", "process" etc. (list can go on) are not allowed
-* Each expression has limited length of "tbd" (the idea is, if it's too long better split it up, also prevent endless chaining)
+* Each expression has limited length default to 50 characters (the idea is, if it's too long better split it up, also prevent endless chaining)
 * ...open to more suggestion
+
+Custom rules regarding keywords and word length screening can be passed as config object when importing SwitchCase into your project.
+``` javascript
+const Match = require("./index");
+const rules = { limit: 50, keywords: ["document", "window", "process"] }; // the value here are set in default, you can custom the rules to your preference
+const match = new Match(rules);
+const win = window;
+
+match({ win })
+  .onMatch("win === window", "correct")
+  .otherwise("wrong")
+  .onEnd((debug, result) => console.log(result)) // Error: individual expression must not...
+```
+Since the expression contains keyword "window", the screening process will deemed invalid and throw an Error. In scenario where you want to match the literal word "window", a safe way to do it without compromising security is to pass a function or as a "simple expression".
+``` javascript
+const rules = { keywords: ["document", "process"] };
+const match = new Match(rules);
+const win = "window";
+
+// when passing simple expression SwitchCase will interpreted as literal string and escape it with quotes
+// which makes it safe to evaluate the expression
+match({ win })
+  .onMatch("window", "correct")
+  .otherwise("wrong")
+  .onEnd((debug, result) => console.log(result)); // correct
+```

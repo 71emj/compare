@@ -7,6 +7,12 @@ function Match(config) {
 	// @ Wrapper provides interface to utilize full power of the SwitchCase
 	// such as interpreting simple expression to more verbose (accepted format of SwitchCase) expression 
 
+	const securityConfig = {
+		limit: 50,
+		keywords: ["document", "window", "process"]
+	};
+	const rules = Object.assign(securityConfig, config);
+
 	function Wrapper(args) {
 		if (!args) throw new Error("argument cannot be empty");
 		if (typeof arguments[0] !== "object") throw new TypeError("Variable must be an object, or an array of objects");
@@ -18,8 +24,6 @@ function Match(config) {
 			// interfaces can be extracted from object, and defined as 
 		  // wrapper methods
 		  _init(isSimple) {
-		  	// passing argIsSimple to watch for single string evaluation
-		  	// init should be a config method to flag different behavior of the function
 		  	this.simpleExp = true;
 		  	return this;
 		  }
@@ -35,7 +39,7 @@ function Match(config) {
 		  }
 
 		  onMatchAND(expressions, values, fn) {
-		    this.findMatch(expressions, values, fn, "AND");
+		    this.findMatch(this._interpret(expressions), values, fn, "AND");
 		    return this;
 		  }
 
@@ -44,23 +48,42 @@ function Match(config) {
 		  	return simpleExp ? this._verbose(expr) : expr;
 		  }
 
-		  _verbose(expression) {
-		  	if (typeof expression === "function") {
-		  		return expression;
+		  _screen(expressions) {
+		  	const len = expressions.length;
+		  	const pattern = `${rules.keywords.join("|")}|.{${rules.limit},}`;
+		  	const regexp = new RegExp(pattern);
+		  	for (let i = 0; i < len; i++) {
+		  		if (typeof expressions[i] === "function") continue;
+		  		if (regexp.test(expressions[i])) { 
+		  			return true;
+		  		}
+		  	}
+		  	return false;
+		  }
+
+		  _verbose(expressions) {
+		  	if (typeof expressions === "function") {
+		  		return expressions;
 		  	} 
 
-		  	if (!Array.isArray(expression)) {
-		  		expression = [ expression ];
+		  	if (!Array.isArray(expressions)) {
+		  		expressions = [ expressions ];
 		  	}
 
-				// const name = Object.entries(this.testTargets)[0][0];
+		  	if (this._screen(expressions)) {
+		  		throw new Error(
+		  			`individual expression must not exceed more than ${rules.limit} characters ` + 
+		  			`and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
+		  		);
+		  	}
+
 				const name = this.testTargets.entries().next(0).value[0];
 				const mapping = expr => {
 					const simple = expr.toString().match(/^\b\w+\b$/); 
 					return simple ? `${name} === "${simple}"` : expr;
 		  	};
 
-		  	return expression.map(mapping);
+		  	return expressions.map(mapping);
 		  }
 		}
 
