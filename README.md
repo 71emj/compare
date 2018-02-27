@@ -147,7 +147,7 @@ match({ home: null })
   .onMatchOR([ "halla", "hishome" ], "not true")
   .onMatchOR([ "home", "skills", "about" ], "true")
   .otherwise("nothing here")
-  .onEnd((debug, result) =>	console.log("nothing here"));
+  .onEnd((debug, result) => console.log("nothing here"));
 ```
 
 #### onEnd(callback(debug, result))
