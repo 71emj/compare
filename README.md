@@ -181,10 +181,10 @@ console.log(evaluation("home")); // "just home"
 // coupled with Array.prototype.filter
 const array = [ /* lots of different things */ ];
 const filtering = elem => match({ elem })
-  .onMatchOR([ "case1", "case2", "case3"], true)
+  .onMatchOR(["case1", "case2", "case3"], true)
   .onEnd((debug, result) => result);
 
 const newArray = array.filter(filtering);
 ```
 
-## Advanced Usage
+## Advance Features
