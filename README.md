@@ -125,11 +125,11 @@ match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
 // the above can be break down to an even more concise structure by passing statements as variables
 // this pattern will effectively separate the evaluation process from definition (unlike switch or nested if/else)
 const statements = {
-	"one": "num1 < num2",
-	"two": "num2 + num1 >= num3",
-	"three": "num3 - num4 + num2 === 0",
-	"four": "num1 * num2 / 1000 >= num3",
-	"five": "num3 + num1 >= num4"
+  "one": "num1 < num2",
+  "two": "num2 + num1 >= num3",
+  "three": "num3 - num4 + num2 === 0",
+  "four": "num1 * num2 / 1000 >= num3",
+  "five": "num3 + num1 >= num4"
 };
 
 match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
