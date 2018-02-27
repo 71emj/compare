@@ -53,7 +53,8 @@ function Match(config) {
 		  		expression = [ expression ];
 		  	}
 
-				const name = Object.entries(this.testTargets)[0][0];
+				// const name = Object.entries(this.testTargets)[0][0];
+				const name = this.testTargets.entries().next(0).value[0];
 				const mapping = expr => {
 					const simple = expr.toString().match(/^\b\w+\b$/); 
 					return simple ? `${name} === "${simple}"` : expr;

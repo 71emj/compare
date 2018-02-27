@@ -111,4 +111,17 @@ describe("test native methods of SwitchCase", () => {
       .otherwise("It's something else")
       .onEnd((debug, result) => expect(result).toBe("It's my home"));
   });
+
+  test("each expression can only be single statement", () => {
+    const name = "home";
+
+    expect(
+      caseSwitch
+        .setMatchingTargets({ name })
+        .findMatch(`() => { name = document.createElement("i"); name.onblur = "something" }`, "something cool", "SIMPLE")
+        .otherwise("It's something else")
+        .onEnd((debug, result) => console.log(result))
+    ).toThrowError("Expression must be single-statement-only");
+  });
+
 });

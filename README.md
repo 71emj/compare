@@ -221,11 +221,35 @@ request("some url", (err, response, body) => {
     .onMatchOR(parseAndEvaluate, "some value")
     .onMatchOR(parseAndEvaluate_2, "other value")
     .otherwise("default value")
-    .onEnd((debug, reult) => console.log("what a long journey to get here")) // much better
+    .onEnd((debug, reult) => console.log("much better")) // much better
 });
 ```
 
 If you wish to use SwitchCase on unknown source this is a preferable pattern, as it gives you more room for security measure.
+
+<strong>note: </strong>when using the function-as-evaluation pattern, in order to access all/specific variable(s) the function will have to use either:
+1. arguments object
+2. rest syntax
+
+``` javascript
+const dataObj = {
+	data1: "something",
+	data2: "anotherthing",
+	data3: "somethingelse"
+};
+
+const processData = (...data) => {
+	const [ data1, data2, data3 ] = data;
+	return console.log({ data1, data2, data3 });
+};
+
+match(dataObj)
+  .onMatch(processData, "something")
+  .otherwise("nothing")
+  .onEnd((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
+
+
+The order of the variable is in the same order passed into SwitchCase.
 
 ### Passing callback at each case
 
@@ -256,13 +280,13 @@ note the argument, val, passed in the callback is in fact the value stated as se
 
 ### Security
 
-The core functionality of SwitchCase is to evaluate "expression" string(s), doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either:
+The core functionality of SwitchCase is to evaluate "expression string(s)", doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either:
 1. Never use it to evaluate unknown source 
 2. Use function instead of expression string with custom filter
 
 There are however a few security measure implemented into SwitchCase (currently under development).
 
-* Each expression is limited to a single "statement" (so one semi-column-only)
+* Each expression is limited to a single "statement" (so one-semi-column-only)
 * An open-close parenthesis in any part of the string are not allowed
 * Keywords such as "window", "document", "process" etc. (list can go on) are not allowed
 * Each expression has limited length of "tbd" (the idea is, if it's too long better split it up, also prevent endless chaining)

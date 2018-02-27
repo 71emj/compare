@@ -147,10 +147,9 @@ describe("test Match, a wrapper of SwitchCase", () => {
 	});
 
 	test("use SwitchCase along with Array methods", () => {
-
 		const array = [ "red", "blue", "yellow", 1, 2, "violet" ];
 		const filtering = elem => match({ elem })
-  		.onMatchAND(["!+elem", "elem.length >= 4", "elem.match(/o/)"], true)
+  		.onMatchAND(["!+elem", "elem.length >= 4", e => e.match(/o/)], true)
   		.onEnd((debug, result) => result);
 
 		const newArray = array.filter(filtering);

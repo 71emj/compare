@@ -20,11 +20,14 @@ class SwitchCase {
   }
 
   setMatchingTargets(...targets) { 
-    // the default length guaranteed for loop to be run once, clearing out prev data if exist
-    const len = targets.length || 1;
-    for (let i = 0, temp = {}; i < len; i++) {
-      this.testTargets = Object.assign(temp, targets[i]);
+    const len = targets.length;
+    let temp = {};
+    for (let i = 0; i < len; i++) {
+      // this.testTargets = Object.assign(temp, targets[i]);
+      temp = Object.assign(temp, targets[i]);
     }
+    const setObjToMap = (map, elem) => map.set(elem[0], elem[1]);
+    this.testTargets = Object.entries(temp).reduce(setObjToMap, new Map());
     return this;
   }
 
@@ -71,34 +74,34 @@ class SwitchCase {
     if (!Array.isArray(cases)) {
       cases = [ cases ];
     }
-    const conditions = new Map();
+    const expressions = new Map();
     const len = cases.length;
     for (let i = 0; i < len; i++) {
-      conditions.set(i, cases[i]);
+      expressions.set(i, cases[i]);
     }
     // now cases are set into dictionary
-    return conditions;
+    return expressions;
   }
 
-  _evaluateAND(conditions) {
-    for (let i = 0; i < conditions.size; i++) {
-      if (!this._evaluateSingleCase(conditions.get(i))) {
+  _evaluateAND(expressions) {
+    for (let i = 0; i < expressions.size; i++) {
+      if (!this._evaluateSingleCase(expressions.get(i))) {
         return false;
       }
     }
     return true;
   }
 
-  _evaluateOR(conditions) {
-    for (let i = 0; i < conditions.size; i++) {
-      if (this._evaluateSingleCase(conditions.get(i))) {
+  _evaluateOR(expressions) {
+    for (let i = 0; i < expressions.size; i++) {
+      if (this._evaluateSingleCase(expressions.get(i))) {
         return true;
       }
     }
     return false;
   }
 
-  _evaluateSingleCase(condition) {
+  _evaluateSingleCase(expression) {
     const testTargets = this.testTargets;
     const matchState = this.isMatched;
 
@@ -106,24 +109,48 @@ class SwitchCase {
       return false;
     }
     // filter here
-    return this._matchingExpression(condition, testTargets);
+    return this._matchingExpression(expression, testTargets);
   }
 
-  _matchingExpression(condition, testTargets) {
+  _filter(expression) {
+    // /\([^-+*/%]+\)|{.+}|.+;.+/
+    /* 
+      @filter 
+      one-semi-column-only rule should be core
+      additional, length check, keyword check should be part of interface
+      security, that can be modify by user via json or config object      
+    */
+    return ( 
+      typeof expression === "function" 
+      ? false
+      : !!expression.match(/[\w]+(?=\(.+\)|\([^-+*%/]+\))|{.+}|.+;.+/)
+    )
+  }
+
+  _matchingExpression(expression, testTargets) {
     const args = [];
     const values = [];
-    const expression = "return " + condition;
+    const statement = "return " + expression;
 
-    Object
-      .entries(testTargets)
-      .forEach(elem => {
-        args.push(elem[0]);
-        values.push(elem[1]);
-      });
+    if (this._filter(expression)) {
+      throw new Error("expression must be single-statement-only");
+    }
 
-    const functionExp = typeof condition === "function" 
-      ? condition 
-      : new Function(...args, expression);
+    // Object
+    //   .entries(testTargets)
+    //   .forEach(elem => {
+    //     args.push(elem[0]);
+    //     values.push(elem[1]);
+    //   });
+    
+    testTargets.forEach((value, key) => {
+      args.push(key);
+      values.push(value);
+    });
+
+    const functionExp = typeof expression === "function" 
+      ? expression 
+      : new Function(...args, statement);
 
     return functionExp(...values);
   }
