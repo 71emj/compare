@@ -239,7 +239,7 @@ match({ type: query[1], value: query[2] })
   .onMatchAND([ "type: case2", "value === somethingelse" ], "this is good too")
   .onMatchAND([ "type: case3", "value === wellvalue" ], val => { /* oh no, need to fetch data for this */
     const getVal = /* make ajax */
-		return getVal;
+    return getVal;
   })
   .otherwise("nothing matched")
   .onEnd((debug, result) => console.log(result)); // we'll receive matched value as usual
@@ -250,16 +250,18 @@ As shown in the example above, callback perform a specific action to fetch data 
 note the argument, val, passed in the callback is in fact the value stated as second argument if provided.
 ``` javascript 
 .onMatch("case", "hello world", val => {
-	console.log(val);
+  console.log(val);
 }) // "hello world"
 ```
 
 ### Security
 
-The core functionality of SwitchCase is to evaluate "expression" string(s), doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either 
-* Never use it on unknown source 
-* Use function instead of expression string with custom filter
+The core functionality of SwitchCase is to evaluate "expression" string(s), doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either:
+1. Never use it to evaluate unknown source 
+2. Use function instead of expression string with custom filter
+
 There are however a few security measure implemented into SwitchCase (currently under development).
+
 * Each expression is limited to a single "statement" (so one semi-column-only)
 * An open-close parenthesis in any part of the string are not allowed
 * Keywords such as "window", "document", "process" etc. (list can go on) are not allowed
