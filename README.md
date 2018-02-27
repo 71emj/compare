@@ -200,28 +200,26 @@ Considering scenario where you need to evaluate JSON received from a remote API.
 
 // in normal situation you would do this
 request("some url", (err, response, body) => {
-	const step1 = /* do something with body */
-	const step2 = /* do somethingelse with step1 */
-	....
-	const usableData = stepN;
-	
-	match({ usableData })
-		.onMatchOR([ "case1", "case2", "case3" ], "some value")
-		.onMatchOR([ "case4", "case5" ], "other value")
-		.otherwise("default value")
-		.onEnd((debug, reult) => console.log("what a long journey to get here")) // "what a long journey to get here"
+  const step1 = /* do something with body */
+  const step2 = /* do somethingelse with step1 */
+  ....
+  const usableData = stepN;
+  match({ usableData })
+    .onMatchOR([ "case1", "case2", "case3" ], "some value")
+    .onMatchOR([ "case4", "case5" ], "other value")
+    .otherwise("default value")
+    .onEnd((debug, reult) => console.log("what a long journey to get here")) // "what a long journey to get here"
 });
 
 // however passing function, can make this process nice again
 request("some url", (err, response, body) => {
-	const parse = body => /* parsing body */;
-	const evaluateTheDataParsed = parsed => /* return boolean */
-	const parseAndEvaluate = target => evaluateTheDataParsed( parse(target) );
-	
-	match({ body })
-		.onMatchOR(parseAndEvaluate, "some value")
-		.onMatchOR(parseAndEvaluate_2, "other value")
-		.otherwise("default value")
-		.onEnd((debug, reult) => console.log("what a long journey to get here")) // much better
+  const parse = body => /* parsing body */;
+  const evaluateTheDataParsed = parsed => /* return boolean */
+  const parseAndEvaluate = target => evaluateTheDataParsed( parse(target) );
+  match({ body })
+    .onMatchOR(parseAndEvaluate, "some value")
+    .onMatchOR(parseAndEvaluate_2, "other value")
+    .otherwise("default value")
+    .onEnd((debug, reult) => console.log("what a long journey to get here")) // much better
 });
 ```
