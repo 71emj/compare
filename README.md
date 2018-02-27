@@ -1,7 +1,7 @@
 # Compare/Case-Compare
-CaseCompare is a zero-dependency library that evaluates complex case matching. CaseCompare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
+Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
 
-<strong>note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as CaseCompare, I later added a wrapper, Compare, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
+<strong>note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as Compare, I later added a wrapper, Compare, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
 ## Features
 * Basic name-value matching similar to switch.
@@ -29,7 +29,7 @@ compare({ name: "home" })
   .onEnd((debug, result) => console.log(result)); // "just home"
 ``` 
 
-The example above show case a pattern similar to javascript "switch", with the exception that CaseCompare allows user to pass variable as second argument of each cases and write the logic at the end of all evaluations.
+The example above show case a pattern similar to javascript "switch", with the exception that Compare allows user to pass variable as second argument of each cases and write the logic at the end of all evaluations.
 
 vanilla switch in equivalent evaluation:
 ``` javascript
@@ -53,7 +53,7 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 
 
 ## APIs
-Following contents are a list of methods for utilizing CaseCompare
+Following contents are a list of methods for utilizing Compare
 
 #### toCase(expression, value[, callback])
 toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see toCaseOR(), toCaseAND for multiple expression evaluation).
@@ -223,7 +223,7 @@ request("some url", (err, response, body) => {
 });
 ```
 
-If you wish to use CaseCompare on unknown source this is a preferable pattern, as it gives you more room for security measure.
+If you wish to use Compare on unknown source this is a preferable pattern, as it gives you more room for security measure.
 
 <strong>note: </strong>when using the function-as-evaluation pattern, in order to access all/specific variable(s) the function will have to use either:
 1. arguments object
@@ -247,7 +247,7 @@ compare(dataObj)
   .onEnd((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
 ```
 
-The order of the variable is in the same as the order you passed into CaseCompare.
+The order of the variable is in the same as the order you passed into Compare.
 
 ### Passing callback at end of a case
 
@@ -278,11 +278,11 @@ note the argument, val, passed in the callback is in fact the value stated as se
 
 ### Security
 
-The core functionality of CaseCompare is to evaluate "expression string(s)", doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either:
+The core functionality of Compare is to evaluate "expression string(s)", doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either:
 1. Never use it to evaluate unknown source 
 2. Use function instead of expression string with custom filter
 
-There are however a few security measures implemented into CaseCompare.
+There are however a few security measures implemented into Compare.
 
 * Each expression is limited to a single "statement" (so one-semi-column-only)
 * An open-close parenthesis in any part of the string are not allowed
@@ -290,7 +290,7 @@ There are however a few security measures implemented into CaseCompare.
 * Each expression has limited length default to 50 characters (the idea is, if it's too long better split it up, also prevent endless chaining)
 * ...open to more suggestion
 
-Custom rules regarding keywords and word length screening can be passed as config object when importing CaseCompare into your project.
+Custom rules regarding keywords and word length screening can be passed as config object when importing Compare into your project.
 ``` javascript
 const Compare = require("./index");
 const rules = { limit: 50, keywords: ["document", "window", "process"] }; // the value here are set in default, you can custom the rules to your preference
@@ -308,7 +308,7 @@ const rules = { keywords: ["document", "process"] };
 const compare = new Compare(rules);
 const win = "window";
 
-// when passing simple expression CaseCompare will interpreted as literal string and escape it with quotes
+// when passing simple expression Compare will interpreted as literal string and escape it with quotes
 // making it safe to evaluate the expressions like this. 
 compare({ win })
   .toCase("window", "correct")
