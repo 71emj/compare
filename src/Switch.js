@@ -29,9 +29,9 @@ class SwitchCase {
     return this;
   }
 
-  // @ findMatch is the native interface of SwitchCase
+  // @ match is the native interface of SwitchCase
   // will need to implement typecheck 
-  findMatch(exp, values, fn, flag) {
+  match(exp, values, fn, flag) {
     [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
     [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
 
@@ -51,7 +51,7 @@ class SwitchCase {
   }
 
   otherwise(values, fn) {
-    this.findMatch("true", values, fn, "SIMPLE");
+    this.match("true", values, fn, "SIMPLE");
     return this;
   }
 

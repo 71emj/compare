@@ -65,7 +65,14 @@ describe("test Match, a wrapper of SwitchCase", () => {
 			match(name)
 				.onMatch("myhome", "not true")
 				.onEnd((debug, result) => debug())
-		).toThrowError("Variable must be an object, or an array of objects");
+		).toThrow("Variable must be an object, or an array of objects");
+
+		const matcher = expect(()=>{
+  		throw new Error('1234');
+		});
+		
+		matcher.toThrow(Error);
+		matcher.toThrow('1234');
 	});
 
 	test("mix expression types: simple, verbose, array, function, in a single chain is supported", () => {

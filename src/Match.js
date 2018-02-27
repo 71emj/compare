@@ -29,17 +29,17 @@ function Match(config) {
 		  }
 
 		  onMatch(singleExp, values, fn) {
-		    this.findMatch(this._interpret(singleExp), values, fn, "SIMPLE");
+		    this.match(this._interpret(singleExp), values, fn, "SIMPLE");
 		    return this;
 		  }
 
 		  onMatchOR(exprs, values, fn) {
-		    this.findMatch(this._interpret(exprs), values, fn, "OR");
+		    this.match(this._interpret(exprs), values, fn, "OR");
 		    return this;
 		  }
 
 		  onMatchAND(exprs, values, fn) {
-		    this.findMatch(this._interpret(exprs), values, fn, "AND");
+		    this.match(this._interpret(exprs), values, fn, "AND");
 		    return this;
 		  }
 
