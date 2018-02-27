@@ -54,28 +54,22 @@ function Match(config) {
 		  	const regexp = new RegExp(pattern);
 		  	for (let i = 0; i < len; i++) {
 		  		if (typeof expressions[i] === "function") continue;
-		  		if (regexp.test(expressions[i])) { 
-		  			return true;
-		  		}
+		  		if (regexp.test(expressions[i])) return true;
 		  	}
 		  	return false;
 		  }
 
 		  _verbose(expressions) {
-		  	if (typeof expressions === "function") {
-		  		return expressions;
-		  	} 
+		  	if (typeof expressions === "function") return expressions; 
 
 		  	if (!Array.isArray(expressions)) {
 		  		expressions = [ expressions ];
 		  	}
 
-		  	if (this._screen(expressions)) {
-		  		throw new Error(
+		  	if (this._screen(expressions)) throw new Error(
 		  			`individual expression must not exceed more than ${rules.limit} characters ` + 
 		  			`and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
-		  		);
-		  	}
+		  	);
 
 				const name = this.testTargets.entries().next(0).value[0];
 				const mapping = expr => {

@@ -13,7 +13,6 @@ class SwitchCase {
   }
 
   set testTargets(targetObj) {
-    // this setter signal init
     this.targets = targetObj;
     this.isMatched = false;
     this.result = null;
@@ -23,7 +22,6 @@ class SwitchCase {
     const len = targets.length;
     let temp = {};
     for (let i = 0; i < len; i++) {
-      // this.testTargets = Object.assign(temp, targets[i]);
       temp = Object.assign(temp, targets[i]);
     }
     const setObjToMap = (map, elem) => map.set(elem[0], elem[1]);
@@ -32,12 +30,12 @@ class SwitchCase {
   }
 
   // @ findMatch is the native interface of SwitchCase
-  // might need to implement stricter check for errors (not really if user only use Match's interface)
+  // will need to implement typecheck 
   findMatch(exp, values, fn, flag) {
     [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
     [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
 
-    const cond = this._setConditions(exp);
+    const expr = this._setExpression(exp);
     const methods = {
       OR: "_evaluateOR",
       AND: "_evaluateAND",
@@ -45,8 +43,8 @@ class SwitchCase {
     };
 
     const matching = flag === "SIMPLE" 
-      ? this[ methods[flag] ](cond.get(0)) 
-      : this[ methods[flag] ](cond);
+      ? this[ methods[flag] ](expr.get(0)) 
+      : this[ methods[flag] ](expr);
     
     matching && this._break(values, fn);
     return this;
@@ -70,33 +68,30 @@ class SwitchCase {
     return true;
   }
 
-  _setConditions(cases) {
+  _setExpression(cases) {
     if (!Array.isArray(cases)) {
       cases = [ cases ];
     }
+    
     const expressions = new Map();
     const len = cases.length;
     for (let i = 0; i < len; i++) {
       expressions.set(i, cases[i]);
     }
-    // now cases are set into dictionary
+
     return expressions;
   }
 
   _evaluateAND(expressions) {
     for (let i = 0; i < expressions.size; i++) {
-      if (!this._evaluateSingleCase(expressions.get(i))) {
-        return false;
-      }
+      if (!this._evaluateSingleCase(expressions.get(i))) return false; 
     }
     return true;
   }
 
   _evaluateOR(expressions) {
     for (let i = 0; i < expressions.size; i++) {
-      if (this._evaluateSingleCase(expressions.get(i))) {
-        return true;
-      }
+      if (this._evaluateSingleCase(expressions.get(i))) return true;
     }
     return false;
   }
@@ -105,26 +100,21 @@ class SwitchCase {
     const testTargets = this.testTargets;
     const matchState = this.isMatched;
 
-    if (matchState || !testTargets) {
-      return false;
-    }
-    // filter here
-    return this._matchingExpression(expression, testTargets);
+    return matchState || !testTargets 
+      ? false 
+      : this._matchingExpression(expression, testTargets);
   }
-
+   /* 
+    @filter 
+    one-semi-column-only rule should be core
+    additional, length check, keyword check should be part of interface
+    security, that can be modify by user via json or config object      
+  */
   _filter(expression) {
     // /\([^-+*/%]+\)|{.+}|.+;.+/
-    /* 
-      @filter 
-      one-semi-column-only rule should be core
-      additional, length check, keyword check should be part of interface
-      security, that can be modify by user via json or config object      
-    */
-    return ( 
-      typeof expression === "function" 
+    return typeof expression === "function" 
       ? false
-      : !!expression.match(/[\w]+(?=\(.+\)|\([^-+*%/]+\))|{.+}|.+;.+/)
-    )
+      : !!expression.match(/[\w]+(?=\(.+\)|\([^-+*%/]+\))|{.+}|.+;.+/);
   }
 
   _matchingExpression(expression, testTargets) {
@@ -132,17 +122,8 @@ class SwitchCase {
     const values = [];
     const statement = "return " + expression;
 
-    if (this._filter(expression)) {
-      throw new Error("expression must be single-statement-only");
-    }
+    if (this._filter(expression)) throw new Error("expression must be single-statement-only");
 
-    // Object
-    //   .entries(testTargets)
-    //   .forEach(elem => {
-    //     args.push(elem[0]);
-    //     values.push(elem[1]);
-    //   });
-    
     testTargets.forEach((value, key) => {
       args.push(key);
       values.push(value);
