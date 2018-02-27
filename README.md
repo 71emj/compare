@@ -151,7 +151,9 @@ match({ home: null })
 ```
 
 #### onEnd(callback(debug, result))
-onEnd method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, onEnd method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three onMatch* methods should be use instead), in addition to receiving matched case result in callback, optional return can tranform the evaluation chain into an statement.
+onEnd method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, onEnd method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three onMatch* methods should be use instead).<br/>
+<br/>
+In addition an optional return can be used in the callback function, tranforming the evaluation chain into an expression.
 
 ``` javascript
 // basic
