@@ -1,5 +1,5 @@
 # SwitchCase
-SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing statement in the form of string(s), array, and function as "case(s)" as well as end-of-the-evaluation callback and individual match callbacks(optional). 
+SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing statement in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual match callbacks(optional). 
 
 <strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
