@@ -249,7 +249,7 @@ match(dataObj)
   .onEnd((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
 ```
 
-The order of the variable is in the same order passed into SwitchCase.
+The order of the variable is in the same as the order you passed into SwitchCase.
 
 ### Passing callback at each case
 
