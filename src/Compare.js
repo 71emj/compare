@@ -43,7 +43,12 @@ function Compare(config) {
 		    return this;
 		  }
 
-		  onEnd(fn) {
+		  toAllOther(values, fn) {
+		    this.match("true", values, fn, "SIMPLE");
+				return this;
+		  }
+
+		  Ended(fn) {
     		const debug = () => {
       		console.log(this.testTargets);
     		}

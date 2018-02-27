@@ -14,14 +14,14 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 	test("Compare can pass in arguments after instanciation", () => {
 		compare({ name: "home" })
 			.toCase("name === 'home'", "It's true!!")
-			.otherwise("It's false")
-			.onEnd((debug, result) => expect(result).toBe("It's true!!"));
+			.toAllOther("It's false")
+			.Ended((debug, result) => expect(result).toBe("It's true!!"));
 	});
 
 	test("The Compare wrapper should porvide interface methods to use SwitchCase", () => {
 		compare({ name: "home" })
 			.toCase("name === 'home'", "It's true")
-			.onEnd((debug, result) => expect(result).toBe("It's true"));
+			.Ended((debug, result) => expect(result).toBe("It's true"));
 	});
 
 	test("single name-value pair expression, should automatically interpreted as variable === home with single target", () => {
@@ -31,14 +31,14 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toCase("myhome", "not true")
 			.toCase(exp, "also not true")
 			.toCase([ "skill", "home" ], "true") // this won't match
-			.otherwise("nothing here")
-			.onEnd((debug, result) => expect(result).toBe("also not true"));
+			.toAllOther("nothing here")
+			.Ended((debug, result) => expect(result).toBe("also not true"));
 
 		compare({ name: null })
 			.toCase("myhome", "not true")
 			.toCase("home", "true")
-			.otherwise("nothing here")
-			.onEnd((debug, result) => {
+			.toAllOther("nothing here")
+			.Ended((debug, result) => {
 				debug();
 				expect(result).toBe("nothing here");
 			});
@@ -48,8 +48,8 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		compare({ home: "home" })
 			.toCaseOR(["halla", "hishome"], "not true")
 			.toCaseOR(["home", "skills", "about"], "true")
-			.otherwise("nothing here")
-			.onEnd((debug, result) =>	expect(result).toBe("true"));
+			.toAllOther("nothing here")
+			.Ended((debug, result) =>	expect(result).toBe("true"));
 	});
 
 	test("forgot to pass variable or variable in wrong format should throw error", () => {
@@ -58,13 +58,13 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		expect(
 			compare()
 				.toCase("myhome", "not true")
-				.onEnd((debug, result) => debug())
+				.Ended((debug, result) => debug())
 		).toThrowError("argument cannot be empty");
 
 		expect(
 			compare(name)
 				.toCase("myhome", "not true")
-				.onEnd((debug, result) => debug())
+				.Ended((debug, result) => debug())
 		).toThrow("Variable must be an object, or an array of objects");
 
 		const compareer = expect(()=>{
@@ -89,8 +89,8 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toCase((...args) => { return console.log(args) }, "just checking")
 			.toCaseAND(["home === 'Taiwan'", "city === 'Charlotte'"], "compareing AND")
 			.toCaseOR("home === 'Taiwan'", "well this is as much as I can think of")
-			.otherwise("no compare found")
-			.onEnd((debug, result) => expect(result).toBe("compareing AND"));
+			.toAllOther("no compare found")
+			.Ended((debug, result) => expect(result).toBe("compareing AND"));
 	});
 
 	test("function as expression argument will only take the first property of the target object", () => {
@@ -104,8 +104,8 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		compare(params)
 			.toCase(exp, "it's number")
 			.toCaseOR([exp, "city === 'Kaohsiung'"], "still not compare")
-			.otherwise("no compare found")
-			.onEnd((debug, result) => expect(result).toBe("no compare found"));
+			.toAllOther("no compare found")
+			.Ended((debug, result) => expect(result).toBe("no compare found"));
 
 		// to be able to check all the variables, user must create a loop themselves
 		// such function will need to leverage arguments or rest syntax
@@ -119,8 +119,8 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		compare(params)
 			.toCase(expression, "it's number")
 			.toCaseOR([exp, "city === 'Kaohsiung'"], "still not compare")
-			.otherwise("no compare found")
-			.onEnd((debug, result) => expect(result).toBe("it's number"));
+			.toAllOther("no compare found")
+			.Ended((debug, result) => expect(result).toBe("it's number"));
 	});
 
 	test("async/promise cannot be evaluate as normal function", () => {
@@ -149,15 +149,15 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toCaseOR([exp2, "city === 'Kaohsiung'"], "still not compare")
 			.toCase(exp, "it's number")
 			.toCase("num === 10", "check if this is true")
-			.otherwise("no compare found")
-			.onEnd((debug, result) => expect(result).toBe("still not compare"));
+			.toAllOther("no compare found")
+			.Ended((debug, result) => expect(result).toBe("still not compare"));
 	});
 
 	test("use SwitchCase along with Array methods", () => {
 		const array = [ "red", "blue", "yellow", 1, 2, "violet" ];
 		const filtering = elem => compare({ elem })
   		.toCaseAND(["!+elem", "elem.length >= 4", elem => elem.match(/o/)], true)
-  		.onEnd((debug, result) => result);
+  		.Ended((debug, result) => result);
 
 		const newArray = array.filter(filtering);
 		expect(newArray).toEqual(["yellow", "violet"]);

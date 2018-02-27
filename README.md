@@ -6,8 +6,8 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 ## Features
 * Basic name-value matching similar to switch.
 * Multiple case matching, supporting || and && operators.
-* Allows infinite chaining, with exception of attaching methods to end case method (see onEnd()).
-* Basic debug function passed as first argument in end case method (see onEnd()), allowed user to see the parameters passed as matching targes.
+* Allows infinite chaining, with exception of attaching methods to end case method (see Ended()).
+* Basic debug function passed as first argument in end case method (see Ended()), allowed user to see the parameters passed as matching targes.
 * Individual case can take second/third argument as variable/callback/both(in order of value, cb) (see toCase()).
 
 ## Installation
@@ -25,8 +25,8 @@ compare({ name: "home" })
   .toCase("myhome", "not my home")
   .toCase("hishome", "not his home")
   .toCase("home", "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // "just home"
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "just home"
 ``` 
 
 The example above show case a pattern similar to javascript "switch", with the exception that Compare allows user to pass variable as second argument of each cases and write the logic at the end of all evaluations.
@@ -55,63 +55,63 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 ## APIs
 Following contents are a list of methods for utilizing Compare
 
-#### toCase(expression, value[, callback])
+#### Compare.toCase(expression[, value[, callback]])
 toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see toCaseOR(), toCaseAND for multiple expression evaluation).
 
 ``` javascript
 // this is valid
 compare({ name: "home" })
   .toCase("home", "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // "just home"
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "just home"
 
 // so is this
 compare({ name: "home" })
   .toCase([ "home" ], "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // "just home"
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "just home"
 
 // this will also work, but only the first expression in the array is evaluated
 compare({ name: "home" })
   .toCase([ "home", "name === 'home'" ], "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // "just home"
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "just home"
 
 // this will fail
 compare({ name: "home" })
   .toCase([ "myhome", "home" ], "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // "nothing matched"
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "nothing matched"
 ```
 
-#### toCaseOR(expressions, value[, callback])
-toCaseOR evaluates an array of expression in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in onEnd.
+#### Compare.toCaseOR(expressions[, value[, callback]])
+toCaseOR evaluates an array of expression in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in Ended.
 
 ``` javascript
 // toCaseOR only needs to find one truthful expression
 compare({ home: "home" })
   .toCaseOR([ "halla", "hishome" ], "case 1 is true")
   .toCaseOR([ "home", "skills", "about" ], "case 2 is true")
-  .otherwise("nothing here")
-  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
+  .toAllOther("nothing here")
+  .Ended((debug, result) => console.log(result)); // "case 2 is true"
 
 // matching multiple variables to expression is also supported by this method
 // note that by passing more than one variable to evaluate, simple name-value is not supported
 compare({ home: "home", name: "71emj" })
   .toCaseOR([ "home === 'halla'", "name === 'hishome'" ], "case 1 is true")
   .toCaseOR([ "home === 'skills'", "name === '71emj'" ], "case 2 is true")
-  .otherwise("nothing here")
-  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
+  .toAllOther("nothing here")
+  .Ended((debug, result) => console.log(result)); // "case 2 is true"
 
 // the use case of toCaseOR can be extended to mathematical evaluations
 compare({ num1: 1000, num2: 2000 })
   .toCaseOR([ "num1 + 200 > num2", "num1 * 2 < num2" ], "case 1 is true")
   .toCaseOR([ "num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2" ], "case 2 is true")
-  .otherwise("nothing here")
-  .onEnd((debug, result) => console.log(result)); // "case 2 is true"
+  .toAllOther("nothing here")
+  .Ended((debug, result) => console.log(result)); // "case 2 is true"
 ```
 
-#### toCaseAND(expressions, value[, callback])
+#### Compare.toCaseAND(expressions[, value[, callback]])
 toCaseAND is another method that evaluates multiple expression in each cases. Contrary to toCaseOR, every statment in the said case must be truthful in order to flag matched.
 
 ``` javascript
@@ -119,8 +119,8 @@ toCaseAND is another method that evaluates multiple expression in each cases. Co
 compare({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
   .toCaseAND([ "num1 < num2", "num2 + num1 >= num3", "num3 - num4 + num2 === 0" ], "case 1 is true")
   .toCaseAND([ "num1 * num2 / 1000 >= num3", "num3 + num1 >= num4" ], "case 2 is true")
-  .otherwise("nothing here")
-  .onEnd((debug, result) => console.log(result)); // "case 1 is true"
+  .toAllOther("nothing here")
+  .Ended((debug, result) => console.log(result)); // "case 1 is true"
 
 // the above can be break down to an even more concise structure by passing expressions as variables
 // this pattern will effectively separate the evaluation process from definition (unlike switch or nested if/else)
@@ -135,23 +135,23 @@ const expressions = {
 compare({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
   .toCaseAND([ expression.one, expression.two, expression.three ], "case 1 is true")
   .toCaseAND([ expression.four, expression.five ], "case 2 is true")
-  .otherwise("nothing here")
-  .onEnd((debug, result) => console.log(result)); // "case 1 is true"
+  .toAllOther("nothing here")
+  .Ended((debug, result) => console.log(result)); // "case 1 is true"
 ```
 
-#### otherwise(value[, callback])
-otherwise is equivalent to default in vanilla switch. Like default in vanilla switch, it's optional but highly suggested as best practice.
+#### Compare.toAllOther(value[, callback])
+toAllOther is equivalent to default in vanilla switch. Like default in vanilla switch, it's optional but highly suggested as best practice.
 
 ``` javascript
 compare({ home: null })
   .toCaseOR([ "halla", "hishome" ], "not true")
   .toCaseOR([ "home", "skills", "about" ], "true")
-  .otherwise("nothing here")
-  .onEnd((debug, result) => console.log("nothing here"));
+  .toAllOther("nothing here")
+  .Ended((debug, result) => console.log("nothing here"));
 ```
 
-#### onEnd(callback(debug, result))
-onEnd method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, onEnd method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase* methods should be use instead).<br/>
+#### Compare.Ended(callback(debug, result))
+Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, Ended method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase* methods should be use instead).<br/>
 <br/>
 In addition an optional return can be used in the callback function, tranforming the evaluation chain into an expression.
 
@@ -161,22 +161,22 @@ compare({ name: "home" })
   .toCase("myhome", "not my home")
   .toCase("hishome", "not his home")
   .toCase("home", "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // "just home"
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "just home"
 
 // better
 const matchedResult = compare({ name: "home" })
   .toCase("home", "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => result);
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => result);
 
 console.log(matchedResult); // "just home"
 
 // even better, functional style XD
 const evaluation = target => compare({ target })
   .toCase("home", "just home")
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => result);
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => result);
 
 console.log(evaluation("home")); // "just home"
 
@@ -184,7 +184,7 @@ console.log(evaluation("home")); // "just home"
 const array = [ /* lots of different things */ ];
 const filtering = elem => compare({ elem })
   .toCaseOR([ "case1", "case2", "case3" ], true)
-  .onEnd((debug, result) => result);
+  .Ended((debug, result) => result);
 
 const newArray = array.filter(filtering);
 ```
@@ -206,8 +206,8 @@ request("some url", (err, response, body) => {
   compare({ usableData })
     .toCaseOR([ "case1", "case2", "case3" ], "some value")
     .toCaseOR([ "case4", "case5" ], "other value")
-    .otherwise("default value")
-    .onEnd((debug, reult) => console.log("what a long journey to get here")) // "what a long journey to get here"
+    .toAllOther("default value")
+    .Ended((debug, reult) => console.log("what a long journey to get here")) // "what a long journey to get here"
 });
 
 // however passing function, can make this process nice again
@@ -218,8 +218,8 @@ request("some url", (err, response, body) => {
   compare({ body })
     .toCaseOR(parseAndEvaluate, "some value")
     .toCaseOR(parseAndEvaluate_2, "other value")
-    .otherwise("default value")
-    .onEnd((debug, reult) => console.log("much better")) // much better
+    .toAllOther("default value")
+    .Ended((debug, reult) => console.log("much better")) // much better
 });
 ```
 
@@ -243,15 +243,15 @@ const processData = (...data) => {
 
 compare(dataObj)
   .toCase(processData, "something")
-  .otherwise("nothing")
-  .onEnd((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
+  .toAllOther("nothing")
+  .Ended((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
 ```
 
 The order of the variable is in the same as the order you passed into Compare.
 
 ### Passing callback at end of a case
 
-Callback can be passed as second argument (replacing value) to all of the matching methods including otherwise. Normally this is not neccessary, as it creates repitition that we all want to avoid...badly. But in scenarios where individual cases require specific action to be done, ex. making Ajax call, setting unique action at specific case becomes valuable. 
+Callback can be passed as second argument (replacing value) to all of the matching methods including toAllOther. Normally this is not neccessary, as it creates repitition that we all want to avoid...badly. But in scenarios where individual cases require specific action to be done, ex. making Ajax call, setting unique action at specific case becomes valuable. 
 
 ``` javascript
 const query = location.search().substring(1).match(/(\w+)=(\w+)/);
@@ -263,8 +263,8 @@ compare({ type: query[1], value: query[2] })
     const getVal = /* make ajax */
     return getVal;
   })
-  .otherwise("nothing matched")
-  .onEnd((debug, result) => console.log(result)); // we'll receive matched value as usual
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // we'll receive matched value as usual
 ```
 
 As shown in the example above, callback perform a specific action to fetch data unknown to the author and pass it back which can then be used in the same code block. <br/>
@@ -299,8 +299,8 @@ const win = window;
 
 compare({ win })
   .toCase("win === window", "correct")
-  .otherwise("wrong")
-  .onEnd((debug, result) => console.log(result)) // Error: individual expression must not...
+  .toAllOther("wrong")
+  .Ended((debug, result) => console.log(result)) // Error: individual expression must not...
 ```
 Since the expression contains keyword "window", the screening process will deemed invalid and throw an Error. In scenario where you want to match the literal word "window", a safe way to do it without compromising security is to pass a function or as a "simple expression".
 ``` javascript
@@ -312,6 +312,6 @@ const win = "window";
 // making it safe to evaluate the expressions like this. 
 compare({ win })
   .toCase("window", "correct")
-  .otherwise("wrong")
-  .onEnd((debug, result) => console.log(result)); // correct
+  .toAllOther("wrong")
+  .Ended((debug, result) => console.log(result)); // correct
 ```
