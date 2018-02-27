@@ -251,7 +251,7 @@ match(dataObj)
 
 The order of the variable is in the same as the order you passed into SwitchCase.
 
-### Passing callback at each case
+### Passing callback at end of a case
 
 Callback can be passed as second argument (replacing value) to all of the matching methods including otherwise. Normally this is not neccessary, as it creates repitition that we all want to avoid...badly. But in scenarios where individual cases require specific action to be done, ex. making Ajax call, setting unique action at specific case becomes valuable. 
 
