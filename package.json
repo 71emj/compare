@@ -1,6 +1,6 @@
 {
-  "name": "switch-case",
-  "version": "0.1.0",
+  "name": "case-compare",
+  "version": "1.0.0",
   "description": "A javascript library for alternative switch",
   "main": "index.js",
   "scripts": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/71emj/SwitchCase.git"
+    "url": "git+https://github.com/71emj/compare.git"
   },
   "author": "71emj",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/71emj/SwitchCase/issues"
+    "url": "https://github.com/71emj/compare/issues"
   },
-  "homepage": "https://github.com/71emj/SwitchCase#readme",
+  "homepage": "https://github.com/71emj/compare#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.1",

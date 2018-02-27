@@ -18,7 +18,7 @@ class SwitchCase {
     this.result = null;
   }
 
-  setMatchingTargets(...targets) { 
+  setTargets(...targets) { 
     const len = targets.length;
     let temp = {};
     for (let i = 0; i < len; i++) {

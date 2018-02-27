@@ -1,6 +1,6 @@
-import SwitchCase from "./Switch";
+import SwitchCase from "./SwitchCase";
 
-function Match(config) {
+function Compare(config) {
 	"use strict";
 	// Match should take in a config object 
 	// and return an wrapper function for minimal interface 	
@@ -28,17 +28,17 @@ function Match(config) {
 		  	return this;
 		  }
 
-		  onMatch(singleExp, values, fn) {
+		  toCase(singleExp, values, fn) {
 		    this.match(this._interpret(singleExp), values, fn, "SIMPLE");
 		    return this;
 		  }
 
-		  onMatchOR(exprs, values, fn) {
+		  toCaseOR(exprs, values, fn) {
 		    this.match(this._interpret(exprs), values, fn, "OR");
 		    return this;
 		  }
 
-		  onMatchAND(exprs, values, fn) {
+		  toCaseAND(exprs, values, fn) {
 		    this.match(this._interpret(exprs), values, fn, "AND");
 		    return this;
 		  }
@@ -94,11 +94,11 @@ function Match(config) {
 		return (
 			switchCase
 				._init(argIsSimple)
-				.setMatchingTargets(...targets)
+				.setTargets(...targets)
 		);
 	}
 
 	return Wrapper;
 }
 
-export default Match;
+export default Compare;

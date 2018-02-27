@@ -1,3 +1,3 @@
-import Match from "./src/Match";
+import Compare from "./src/Compare";
 
-module.exports = Match;
+module.exports = Compare;
