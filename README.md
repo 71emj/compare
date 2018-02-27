@@ -1,9 +1,9 @@
 # SwitchCase
-SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing statement in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual match callbacks(optional). 
+SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual match callbacks(optional). 
 
 <strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
-<strong>Important Note: </strong>security feature will be implement in the next interation, where statement can only be a "single-statment" ie. one-semi-column-only. Multi-statement evaluations are suggested to be split into separate statement or be constructed into a custom function
+<strong>Important Note: </strong>security feature will be implement in the next interation, where expression can only be a "single-statment" ie. one-semi-column-only. Multi-expression evaluations are suggested to be split into separate expression or be constructed into a custom function
 
 ## Features
 * Basic name-value matching similar to switch.
@@ -57,8 +57,8 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 ## APIs
 Following contents are a list of methods for utilizing SwitchCase
 
-#### onMatch(statement, value[, callback])
-onMatch is similar to "case" in vanilla switch. The statement can be either a string or an array. However since the onMatch is designed to match one statment in each case, only the first statement in an array is evaluated in this method (see onMatchOR(), onMatchAND for multiple statement evaluation).
+#### onMatch(expression, value[, callback])
+onMatch is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the onMatch is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see onMatchOR(), onMatchAND for multiple expression evaluation).
 
 ``` javascript
 // this is valid
@@ -73,7 +73,7 @@ match({ name: "home" })
   .otherwise("nothing matched")
   .onEnd((debug, result) => console.log(result)); // "just home"
 
-// this will also work, but only the first statement in the array is evaluated
+// this will also work, but only the first expression in the array is evaluated
 match({ name: "home" })
   .onMatch([ "home", "name === 'home'" ], "just home")
   .otherwise("nothing matched")
@@ -86,18 +86,18 @@ match({ name: "home" })
   .onEnd((debug, result) => console.log(result)); // "nothing matched"
 ```
 
-#### onMatchOR(statements, value[, callback])
-onMatchOR evaluates an array of statement in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in onEnd.
+#### onMatchOR(expressions, value[, callback])
+onMatchOR evaluates an array of expression in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in onEnd.
 
 ``` javascript
-// onMatchOR only needs to find one truthful statement
+// onMatchOR only needs to find one truthful expression
 match({ home: "home" })
   .onMatchOR([ "halla", "hishome" ], "case 1 is true")
   .onMatchOR([ "home", "skills", "about" ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
-// matching multiple variables to statement is also supported by this method
+// matching multiple variables to expression is also supported by this method
 // note that by passing more than one variable to evaluate, simple name-value is not supported
 match({ home: "home", name: "71emj" })
   .onMatchOR([ "home === 'halla'", "name === 'hishome'" ], "case 1 is true")
@@ -113,8 +113,8 @@ match({ num1: 1000, num2: 2000 })
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 ```
 
-#### onMatchAND(statements, value[, callback])
-onMatchAND is another method that evaluates multiple statement in each cases. Contrary to onMatchOR, every statment in the said case must be truthful in order to flag matched.
+#### onMatchAND(expressions, value[, callback])
+onMatchAND is another method that evaluates multiple expression in each cases. Contrary to onMatchOR, every statment in the said case must be truthful in order to flag matched.
 
 ``` javascript
 // the onMatchAND is especially useful when matching a large amount of cases that needs to be true
@@ -124,9 +124,9 @@ match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 1 is true"
 
-// the above can be break down to an even more concise structure by passing statements as variables
+// the above can be break down to an even more concise structure by passing expressions as variables
 // this pattern will effectively separate the evaluation process from definition (unlike switch or nested if/else)
-const statements = {
+const expressions = {
   "one": "num1 < num2",
   "two": "num2 + num1 >= num3",
   "three": "num3 - num4 + num2 === 0",
@@ -135,8 +135,8 @@ const statements = {
 };
 
 match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
-  .onMatchAND([ statement.one, statement.two, statement.three ], "case 1 is true")
-  .onMatchAND([ statement.four, statement.five ], "case 2 is true")
+  .onMatchAND([ expression.one, expression.two, expression.three ], "case 1 is true")
+  .onMatchAND([ expression.four, expression.five ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 1 is true"
 ```
@@ -192,7 +192,8 @@ const newArray = array.filter(filtering);
 ```
 
 ## Advance Features
-Passing a function as evaluation statement
+
+### Passing a function as evaluation expression
 
 Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format.
 
@@ -223,3 +224,44 @@ request("some url", (err, response, body) => {
     .onEnd((debug, reult) => console.log("what a long journey to get here")) // much better
 });
 ```
+
+If you wish to use SwitchCase on unknown source this is a preferable pattern, as it gives you more room for security measure.
+
+### Passing callback at each case
+
+Callback can be passed as second argument (replacing value) to all of the matching methods including otherwise. Normally this is not neccessary, as it creates repitition that we all want to avoid...badly. But in scenarios where individual cases require specific action to be done, ex. making Ajax call, setting unique action at specific case becomes valuable. 
+
+``` javascript
+const query = location.search().substring(1).match(/(\w+)=(\w+)/);
+
+match({ type: query[1], value: query[2] })
+  .onMatchAND([ "type: case1", "value === something" ], "some value is good enough")
+  .onMatchAND([ "type: case2", "value === somethingelse" ], "this is good too")
+  .onMatchAND([ "type: case3", "value === wellvalue" ], val => { /* oh no, need to fetch data for this */
+    const getVal = /* make ajax */
+		return getVal;
+  })
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // we'll receive matched value as usual
+```
+
+As shown in the example above, callback perform a specific action to fetch data unknown to the author and pass it back which can then be used in the same code block. <br/>
+<br/>
+note the argument, val, passed in the callback is in fact the value stated as second argument if provided.
+``` javascript 
+.onMatch("case", "hello world", val => {
+	console.log(val);
+}) // "hello world"
+```
+
+### Security
+
+The core functionality of SwitchCase is to evaluate "expression" string(s), doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either 
+* Never use it on unknown source 
+* Use function instead of expression string with custom filter
+There are however a few security measure implemented into SwitchCase (currently under development).
+* Each expression is limited to a single "statement" (so one semi-column-only)
+* An open-close parenthesis in any part of the string are not allowed
+* Keywords such as "window", "document", "process" etc. (list can go on) are not allowed
+* Each expression has limited length of "tbd" (the idea is, if it's too long better split it up, also prevent endless chaining)
+* ...open to more suggestion
