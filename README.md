@@ -3,6 +3,8 @@ SwithcCase is a zero-dependency library that evaluates complex case matching. Sw
 
 <strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
+<strong>Important Note: </strong>security feature will be implement in the next interation, where statement can only be a "single-statment" ie. one-semi-column-only. Multi-statement evaluations are suggested to be split into separate statement or be constructed into a custom function
+
 ## Features
 * Basic name-value matching similar to switch.
 * Multiple case matching, supporting || and && operators.
@@ -90,23 +92,23 @@ onMatchOR evaluates an array of statement in each cases. If any of the cases are
 ``` javascript
 // onMatchOR only needs to find one truthful statement
 match({ home: "home" })
-  .onMatchOR(["halla", "hishome"], "case 1 is true")
-  .onMatchOR(["home", "skills", "about"], "case 2 is true")
+  .onMatchOR([ "halla", "hishome" ], "case 1 is true")
+  .onMatchOR([ "home", "skills", "about" ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
 // matching multiple variables to statement is also supported by this method
 // note that by passing more than one variable to evaluate, simple name-value is not supported
 match({ home: "home", name: "71emj" })
-  .onMatchOR(["home === 'halla'", "name === 'hishome'"], "case 1 is true")
-  .onMatchOR(["home === 'skills'", "name === '71emj'"], "case 2 is true")
+  .onMatchOR([ "home === 'halla'", "name === 'hishome'" ], "case 1 is true")
+  .onMatchOR([ "home === 'skills'", "name === '71emj'" ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
 // the use case of onMatchOR can be extended to mathematical evaluations
 match({ num1: 1000, num2: 2000 })
-  .onMatchOR(["num1 + 200 > num2", "num1 * 2 < num2"], "case 1 is true")
-  .onMatchOR(["num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2"], "case 2 is true")
+  .onMatchOR([ "num1 + 200 > num2", "num1 * 2 < num2" ], "case 1 is true")
+  .onMatchOR([ "num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2" ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 ```
@@ -117,8 +119,8 @@ onMatchAND is another method that evaluates multiple statement in each cases. Co
 ``` javascript
 // the onMatchAND is especially useful when matching a large amount of cases that needs to be true
 match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
-  .onMatchAND(["num1 < num2", "num2 + num1 >= num3", "num3 - num4 + num2 === 0"], "case 1 is true")
-  .onMatchAND(["num1 * num2 / 1000 >= num3", "num3 + num1 >= num4"], "case 2 is true")
+  .onMatchAND([ "num1 < num2", "num2 + num1 >= num3", "num3 - num4 + num2 === 0" ], "case 1 is true")
+  .onMatchAND([ "num1 * num2 / 1000 >= num3", "num3 + num1 >= num4" ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 1 is true"
 
@@ -133,8 +135,8 @@ const statements = {
 };
 
 match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
-  .onMatchAND([statement.one, statement.two, statement.three], "case 1 is true")
-  .onMatchAND([statement.four, statement.five], "case 2 is true")
+  .onMatchAND([ statement.one, statement.two, statement.three ], "case 1 is true")
+  .onMatchAND([ statement.four, statement.five ], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 1 is true"
 ```
@@ -144,8 +146,8 @@ otherwise is equivalent to default in vanilla switch. Like default in vanilla sw
 
 ``` javascript
 match({ home: null })
-  .onMatchOR(["halla", "hishome"], "not true")
-  .onMatchOR(["home", "skills", "about"], "true")
+  .onMatchOR([ "halla", "hishome" ], "not true")
+  .onMatchOR([ "home", "skills", "about" ], "true")
   .otherwise("nothing here")
   .onEnd((debug, result) =>	console.log("nothing here"));
 ```
@@ -183,10 +185,43 @@ console.log(evaluation("home")); // "just home"
 // coupled with Array.prototype.filter
 const array = [ /* lots of different things */ ];
 const filtering = elem => match({ elem })
-  .onMatchOR(["case1", "case2", "case3"], true)
+  .onMatchOR([ "case1", "case2", "case3" ], true)
   .onEnd((debug, result) => result);
 
 const newArray = array.filter(filtering);
 ```
 
 ## Advance Features
+Passing a function as evaluation statement
+
+Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format.
+
+``` javascript
+
+// in normal situation you would do this
+request("some url", (err, response, body) => {
+	const step1 = /* do something with body */
+	const step2 = /* do somethingelse with step1 */
+	....
+	const usableData = stepN;
+	
+	match({ usableData })
+		.onMatchOR([ "case1", "case2", "case3" ], "some value")
+		.onMatchOR([ "case4", "case5" ], "other value")
+		.otherwise("default value")
+		.onEnd((debug, reult) => console.log("what a long journey to get here")) // "what a long journey to get here"
+});
+
+// however passing function, can make this process nice again
+request("some url", (err, response, body) => {
+	const parse = body => /* parsing body */;
+	const evaluateTheDataParsed = parsed => /* return boolean */
+	const parseAndEvaluate = target => evaluateTheDataParsed( parse(target) );
+	
+	match({ body })
+		.onMatchOR(parseAndEvaluate, "some value")
+		.onMatchOR(parseAndEvaluate_2, "other value")
+		.otherwise("default value")
+		.onEnd((debug, reult) => console.log("what a long journey to get here")) // much better
+});
+```

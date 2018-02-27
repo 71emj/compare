@@ -145,6 +145,17 @@ describe("test Match, a wrapper of SwitchCase", () => {
 			.otherwise("no match found")
 			.onEnd((debug, result) => expect(result).toBe("still not match"));
 	});
+
+	test("use SwitchCase along with Array methods", () => {
+
+		const array = [ "red", "blue", "yellow", 1, 2, "violet" ];
+		const filtering = elem => match({ elem })
+  		.onMatchAND(["!+elem", "elem.length >= 4", "elem.match(/o/)"], true)
+  		.onEnd((debug, result) => result);
+
+		const newArray = array.filter(filtering);
+		expect(newArray).toEqual(["yellow", "violet"]);
+	});
 });
 
 // a good security check is limiting expression to be 
