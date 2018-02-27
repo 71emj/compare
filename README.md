@@ -1,5 +1,5 @@
 # SwitchCase
-SwithcCase is a zero-dependency library that evaluates complex case matching; with features supporting evaluations made by passing expression string(s), value string(s), function(s) as "case(s)" as well as end-of-the-evaluation callback and individual match callbacks(optional). 
+SwithcCase is a zero-dependency library that evaluates complex case matching. SwitchCase have features supporting evaluations made by passing statement in the form of string(s), array, and function as "case(s)" as well as end-of-the-evaluation callback and individual match callbacks(optional). 
 
 note on naming in the following doc: the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
@@ -55,13 +55,10 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 ## APIs
 followings are a list of methods for utilizing SwitchCase
 
-#### .onMatch(expression, value[, callback])
-onMatch is similar to "case" in vanilla switch. The expression argument can be either a string of expression or an array of expressions. However since the onMatch is designed to only match one case, only the first expression in the array will be evaluate in this method (see onMatchOR(), onMatchAND for multiple expression).
+#### onMatch(statement, value[, callback])
+onMatch is similar to "case" in vanilla switch. The statement can be either a string or an array. However since the onMatch is designed to match one statment in each case, only the first expression in an array will be evaluate in this method (see onMatchOR(), onMatchAND for multiple statement evaluations).
 
 ``` javascript
-const Match = require("./index");
-const match = new Match();
-
 // this is valid
 match({ name: "home" })
   .onMatch("home", "just home")
@@ -74,7 +71,7 @@ match({ name: "home" })
 	.otherwise("nothing matched")
 	.onEnd((debug, result) => console.log(result)); // "just home"
 
-// this will also work, but only the first expression in the array is evaluated
+// this will also work, but only the first statement in the array is evaluated
 match({ name: "home" })
   .onMatch([ "home", "name === 'home'" ], "just home")
 	.otherwise("nothing matched")
@@ -87,13 +84,10 @@ match({ name: "home" })
 	.onEnd((debug, result) => console.log(result)); // "nothing matched"
 ```
 
-#### .onMatchOR(expressions, value[, callback])
-onMatchOR evaluates an array of expressions in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in onEnd.
+#### onMatchOR(statements, value[, callback])
+onMatchOR evaluates an array of statement in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in onEnd.
 
 ``` javascript
-const Match = require("./index");
-const match = new Match();
-
 // onMatchOR only needs to find one truthful statement
 match({ home: "home" })
   .onMatchOR(["halla", "hishome"], "case 1 is true")
@@ -101,7 +95,7 @@ match({ home: "home" })
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 
-// matching multiple variables to expression is also supported by this method
+// matching multiple variables to statement is also supported by this method
 // note that by passing more than one variable to evaluate, simple name-value is not supported
 match({ home: "home", name: "71emj" })
   .onMatchOR(["home === 'halla'", "name === 'hishome'"], "case 1 is true")
@@ -116,3 +110,81 @@ match({ num1: 1000, num2: 2000 })
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
 ```
+
+#### onMatchAND(statements, value[, callback])
+onMatchAND is another method that evaluates multiple statement in each cases. Contrary to onMatchOR, every statment in the said case must be truthful in order to flag matched.
+
+``` javascript
+// the onMatchAND is especially useful when matching a large amount of cases that needs to be true
+match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
+  .onMatchAND(["num1 < num2", "num2 + num1 >= num3", "num3 - num4 + num2 === 0"], "case 1 is true")
+  .onMatchAND(["num1 * num2 / 1000 >= num3", "num3 + num1 >= num4"], "case 2 is true")
+  .otherwise("nothing here")
+  .onEnd((debug, result) => console.log(result)); // "case 1 is true"
+
+// the above can be break down to an even more concise structure by passing statements as variables
+// this pattern will effectively separate the evaluation process from definition (unlike switch or nested if/else)
+const statements = {
+	"1": "num1 < num2",
+	"2": "num2 + num1 >= num3",
+	"3": "num3 - num4 + num2 === 0",
+	"4": "num1 * num2 / 1000 >= num3",
+	"5": "num3 + num1 >= num4"
+};
+
+match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
+  .onMatchAND([statement.1, statement.2, statement.3], "case 1 is true")
+  .onMatchAND([statement.4, statement.5], "case 2 is true")
+  .otherwise("nothing here")
+  .onEnd((debug, result) => console.log(result)); // "case 1 is true"
+```
+
+#### otherwise(value[, callback])
+otherwise is equivalent to default in vanilla switch. Like default in vanilla switch, it's optional but highly suggested as best practice.
+
+``` javascript
+match({ home: null })
+  .onMatchOR(["halla", "hishome"], "not true")
+  .onMatchOR(["home", "skills", "about"], "true")
+  .otherwise("nothing here")
+  .onEnd((debug, result) =>	console.log("nothing here"));
+```
+
+#### onEnd(callback(debug, result))
+onEnd method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, onEnd method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three onMatch* methods should be use instead), in addition to receiving matched case result in callback, optional return can tranform the evaluation chain into an expression.
+
+``` javascript
+// basic
+match({ name: "home" })
+  .onMatch("myhome", "not my home")
+  .onMatch("hishome", "not his home")
+  .onMatch("home", "just home")
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => console.log(result)); // "just home"
+
+// better
+const matchedResult = match({ name: "home" })
+  .onMatch("home", "just home")
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => result);
+
+console.log(matchedResult); // "just home"
+
+// event better, functional style XD
+const evaluation = target => match({ target })
+  .onMatch("home", "just home")
+  .otherwise("nothing matched")
+  .onEnd((debug, result) => result);
+
+console.log(evaluation("home")); // "just home"
+
+// coupled with array.filter
+const array = [ /* lots of different things */ ];
+const filtering = elem => match({ elem })
+  .onMatchOR([ "case1", "case2", "case3"], true)
+  .otherwise(false)
+  .onEnd((debug, result) => result);
+
+const newArray = array.filter(filtering);
+```
+
