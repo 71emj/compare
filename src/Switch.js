@@ -55,7 +55,7 @@ class SwitchCase {
     return this;
   }
 
-  onEnd(fn) {
+  end(fn) {
     const debug = () => {
       console.log(this.testTargets);
     }

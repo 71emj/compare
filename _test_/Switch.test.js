@@ -12,14 +12,14 @@ describe("test native methods of SwitchCase", () => {
       .setMatchingTargets({ name: "skills" })
       .findMatch([`name === "skills"`], "It's skills", "SIMPLE")
       .findMatch([`name === "home"`], "It's home", "SIMPLE")
-			.onEnd((debug, vals) => expect(vals).toBe("It's skills"));
+			.end((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
   test("setting string instead of array as condition in simple match should be valid", () => {
     caseSwitch
       .setMatchingTargets({ name: "skills" })
       .findMatch(`name === "skills"`, "It's skills", "SIMPLE")
-			.onEnd((debug, vals) => expect(vals).toBe("It's skills"));
+			.end((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
   test("if setMatchingTargets takes in null or types other than object literal, should throw error", () => {
@@ -27,7 +27,7 @@ describe("test native methods of SwitchCase", () => {
       .setMatchingTargets()
       .findMatch([`name === "skills"`], "It's skills", "SIMPLE")
       .findMatch([`name === "home"`], "It's home", "SIMPLE")
-			.onEnd((debug, vals) => expect(vals).toBe(null));
+			.end((debug, vals) => expect(vals).toBe(null));
   });
 
   test("if input name is the same as the literal condition name, if value matched should return true", () => {
@@ -35,7 +35,7 @@ describe("test native methods of SwitchCase", () => {
       .setMatchingTargets({ home: "home" })
       .findMatch([`home === "skills"`], "It's skills", "SIMPLE")
       .findMatch([`home === "home"`], "It's home", "SIMPLE")
-			.onEnd((debug, vals) => expect(vals).toBe("It's home"));
+			.end((debug, vals) => expect(vals).toBe("It's home"));
   });
 
   test("expression w/ multiple variables and conditions can still be evaluated", () => {
@@ -48,14 +48,14 @@ describe("test native methods of SwitchCase", () => {
       .setMatchingTargets(params)
       .findMatch([`winScrollY < winHeight - 200`], "case 1 is true", "SIMPLE")
       .otherwise("I lied it's false")
-      .onEnd((debug, vals) => expect(vals).toBe("I lied it's false"));
+      .end((debug, vals) => expect(vals).toBe("I lied it's false"));
 
     params.winHeight = 200;
     caseSwitch
       .setMatchingTargets(params)
       .findMatch([`winScrollY < winHeight - 200`, `winScrollY > winHeight - 200`], "case 1 is true", "OR")
       .otherwise("I lied it's false")
-      .onEnd((debug, vals) => expect(vals).toBe("case 1 is true"));
+      .end((debug, vals) => expect(vals).toBe("case 1 is true"));
   });
 
   test("if variable name, wrapped in quotes should return falsy", () => {
@@ -67,15 +67,15 @@ describe("test native methods of SwitchCase", () => {
 		caseSwitch
       .setMatchingTargets({ name: "skills" })
       .findMatch(`'name' === "skills"`, true, "SIMPLE")
-      .onEnd((debug, results) => expect(results).toBeFalsy());
+      .end((debug, results) => expect(results).toBeFalsy());
 
     caseSwitch
       .setMatchingTargets(params)
       .findMatch(`winScrollY < 'winHeight' - 200`, true, "SIMPLE")
-      .onEnd((debug, results) => expect(results).toBeFalsy());
+      .end((debug, results) => expect(results).toBeFalsy());
   });
 
-  test("returning value in onEnd, will turned the whole chain into an expression", () => {
+  test("returning value in end, will turned the whole chain into an expression", () => {
   	const name = "home";
   	const resultOfMatch = 
   	caseSwitch
@@ -83,7 +83,7 @@ describe("test native methods of SwitchCase", () => {
       .findMatch(`name === "skills"`, "It's skills", "SIMPLE")
       .findMatch(`name === "about"`, "It's about", "SIMPLE")
       .findMatch(`name === "home"`, "It's home", "SIMPLE")
-      .onEnd((debug, result) => result);
+      .end((debug, result) => result);
 
    	expect(resultOfMatch).toBe("It's home");
   });
@@ -96,7 +96,7 @@ describe("test native methods of SwitchCase", () => {
       .setMatchingTargets({ name })
       .findMatch(exp, "It's home", "SIMPLE")
       .otherwise("It's something else")
-      .onEnd((debug, result) => expect(result).toBe("It's home"));
+      .end((debug, result) => expect(result).toBe("It's home"));
   });
 
   test("returning value in a match case callback is the same as passing value as second argument", () => {
@@ -109,7 +109,7 @@ describe("test native methods of SwitchCase", () => {
         return "It's my home";
       }, "SIMPLE")
       .otherwise("It's something else")
-      .onEnd((debug, result) => expect(result).toBe("It's my home"));
+      .end((debug, result) => expect(result).toBe("It's my home"));
   });
 
   test("each expression can only be single statement", () => {
@@ -120,7 +120,7 @@ describe("test native methods of SwitchCase", () => {
         .setMatchingTargets({ name })
         .findMatch(`() => { name = document.createElement("i"); name.onblur = "something" }`, "something cool", "SIMPLE")
         .otherwise("It's something else")
-        .onEnd((debug, result) => console.log(result))
+        .end((debug, result) => console.log(result))
     ).toThrowError("Expression must be single-statement-only");
   });
 

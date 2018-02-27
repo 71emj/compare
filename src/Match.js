@@ -33,51 +33,60 @@ function Match(config) {
 		    return this;
 		  }
 
-		  onMatchOR(expressions, values, fn) {
-		    this.findMatch(this._interpret(expressions), values, fn, "OR");
+		  onMatchOR(exprs, values, fn) {
+		    this.findMatch(this._interpret(exprs), values, fn, "OR");
 		    return this;
 		  }
 
-		  onMatchAND(expressions, values, fn) {
-		    this.findMatch(this._interpret(expressions), values, fn, "AND");
+		  onMatchAND(exprs, values, fn) {
+		    this.findMatch(this._interpret(exprs), values, fn, "AND");
 		    return this;
 		  }
 
-		  _interpret(expr) {
-				const { simpleExp } = this;
-		  	return simpleExp ? this._verbose(expr) : expr;
+		  onEnd(fn) {
+    		const debug = () => {
+      		console.log(this.testTargets);
+    		}
+    		return fn(debug, this.result);
+  		}
+
+		  _interpret(exprs) {
+		  	if (this._screen(exprs)) throw new Error(
+		  		`individual expression must not exceed more than ${rules.limit} characters ` 
+		  		+ `and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
+		  	);
+		  	return this.simpleExp ? this._verbose(exprs) : exprs;
 		  }
 
-		  _screen(expressions) {
-		  	const len = expressions.length;
+		  _screen(exprs) {
+		  	if (!Array.isArray(exprs)) {
+		  		exprs = [ exprs ];
+		  	}
+		  	const len = exprs.length;
 		  	const pattern = `${rules.keywords.join("|")}|.{${rules.limit},}`;
 		  	const regexp = new RegExp(pattern);
+
 		  	for (let i = 0; i < len; i++) {
-		  		if (typeof expressions[i] === "function") continue;
-		  		if (regexp.test(expressions[i])) return true;
+		  		if (typeof exprs[i] === "function") continue;
+		  		if (regexp.test(exprs[i])) return true;
 		  	}
 		  	return false;
 		  }
 
-		  _verbose(expressions) {
-		  	if (typeof expressions === "function") return expressions; 
+		  _verbose(exprs) {
+		  	if (typeof exprs === "function") return exprs; 
 
-		  	if (!Array.isArray(expressions)) {
-		  		expressions = [ expressions ];
+		  	if (!Array.isArray(exprs)) {
+		  		exprs = [ exprs ];
 		  	}
 
-		  	if (this._screen(expressions)) throw new Error(
-		  			`individual expression must not exceed more than ${rules.limit} characters ` + 
-		  			`and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
-		  	);
-
 				const name = this.testTargets.entries().next(0).value[0];
-				const mapping = expr => {
-					const simple = expr.toString().match(/^\b\w+\b$/); 
-					return simple ? `${name} === "${simple}"` : expr;
+				const mapping = expression => {
+					const simple = expression.toString().match(/^\b\w+\b$/); 
+					return simple ? `${name} === "${simple}"` : expression;
 		  	};
 
-		  	return expressions.map(mapping);
+		  	return exprs.map(mapping);
 		  }
 		}
 
