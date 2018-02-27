@@ -55,7 +55,7 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 ## APIs
 Following contents are a list of methods for utilizing Compare
 
-#### Compare.toCase(expression[, value[, callback]])
+### Compare.toCase(expression[, value[, callback]])
 toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see toCaseOR(), toCaseAND for multiple expression evaluation).
 
 ``` javascript
@@ -84,7 +84,7 @@ compare({ name: "home" })
   .Ended((debug, result) => console.log(result)); // "nothing matched"
 ```
 
-#### Compare.toCaseOR(expressions[, value[, callback]])
+### Compare.toCaseOR(expressions[, value[, callback]])
 toCaseOR evaluates an array of expression in each cases. If any of the cases are found true, the method will return and save the value to result to be used later in Ended.
 
 ``` javascript
@@ -111,7 +111,7 @@ compare({ num1: 1000, num2: 2000 })
   .Ended((debug, result) => console.log(result)); // "case 2 is true"
 ```
 
-#### Compare.toCaseAND(expressions[, value[, callback]])
+### Compare.toCaseAND(expressions[, value[, callback]])
 toCaseAND is another method that evaluates multiple expression in each cases. Contrary to toCaseOR, every statment in the said case must be truthful in order to flag matched.
 
 ``` javascript
@@ -139,7 +139,7 @@ compare({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
   .Ended((debug, result) => console.log(result)); // "case 1 is true"
 ```
 
-#### Compare.toAllOther(value[, callback])
+### Compare.toAllOther(value[, callback])
 toAllOther is equivalent to default in vanilla switch. Like default in vanilla switch, it's optional but highly suggested as best practice.
 
 ``` javascript
@@ -150,7 +150,7 @@ compare({ home: null })
   .Ended((debug, result) => console.log("nothing here"));
 ```
 
-#### Compare.Ended(callback(debug, result))
+### Compare.Ended(callback(debug, result))
 Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, Ended method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase* methods should be use instead).<br/>
 <br/>
 In addition an optional return can be used in the callback function, tranforming the evaluation chain into an expression.
