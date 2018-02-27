@@ -233,14 +233,14 @@ If you wish to use SwitchCase on unknown source this is a preferable pattern, as
 
 ``` javascript
 const dataObj = {
-	data1: "something",
-	data2: "anotherthing",
-	data3: "somethingelse"
+  data1: "something",
+  data2: "anotherthing",
+  data3: "somethingelse"
 };
 
 const processData = (...data) => {
-	const [ data1, data2, data3 ] = data;
-	return console.log({ data1, data2, data3 });
+  const [ data1, data2, data3 ] = data;
+  return console.log({ data1, data2, data3 });
 };
 
 match(dataObj)
