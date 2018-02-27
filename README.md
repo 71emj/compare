@@ -1,7 +1,7 @@
 # Compare/Case-Compare
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
 
-<strong>note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as Compare, I later added a wrapper, Compare, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
+<strong>note on naming: </strong>naming is pretty much settled at this point, minor changes might applied to method names but should stay consistent to current naming pattern. 
 
 ## Features
 * Basic name-value matching similar to switch.
