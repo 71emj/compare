@@ -3,7 +3,7 @@ SwithcCase is a zero-dependency library that evaluates complex case matching. Sw
 
 <strong>Note on naming in the following doc:</strong> the naming of the library is still tbd. The original library is named as SwitchCase, I later added a wrapper, Match, as an interface to minimalize footprint. Since this is still an early version of the library, I decided to keep the naming option open until it is ready to ship.
 
-<strong>Important Note: </strong>security feature will be implement in the next interation, where expression can only be a "single-statment" ie. one-semi-column-only. Multi-expression evaluations are suggested to be split into separate expression or be constructed into a custom function
+<strong>Important Note: </strong>security feature will be implement in the next interation, where expression can only be a "single-statment" ie. one-semi-column-only. Multi-statement expressions are suggested to be split into separate expression or be constructed into a custom function
 
 ## Features
 * Basic name-value matching similar to switch.
