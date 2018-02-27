@@ -193,7 +193,7 @@ const newArray = array.filter(filtering);
 
 ## Advance Features
 
-### Passing a function as evaluation expression
+### Passing a function as expression
 
 Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format.
 
