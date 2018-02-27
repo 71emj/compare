@@ -109,7 +109,6 @@ match({ num1: 1000, num2: 2000 })
   .onMatchOR(["num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2"], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 2 is true"
-<<<<<<< HEAD
 ```
 
 #### onMatchAND(statements, value[, callback])
@@ -126,16 +125,16 @@ match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
 // the above can be break down to an even more concise structure by passing statements as variables
 // this pattern will effectively separate the evaluation process from definition (unlike switch or nested if/else)
 const statements = {
-	"1": "num1 < num2",
-	"2": "num2 + num1 >= num3",
-	"3": "num3 - num4 + num2 === 0",
-	"4": "num1 * num2 / 1000 >= num3",
-	"5": "num3 + num1 >= num4"
+	"one": "num1 < num2",
+	"two": "num2 + num1 >= num3",
+	"three": "num3 - num4 + num2 === 0",
+	"four": "num1 * num2 / 1000 >= num3",
+	"five": "num3 + num1 >= num4"
 };
 
 match({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
-  .onMatchAND([statement.1, statement.2, statement.3], "case 1 is true")
-  .onMatchAND([statement.4, statement.5], "case 2 is true")
+  .onMatchAND([statement.one, statement.two, statement.three], "case 1 is true")
+  .onMatchAND([statement.four, statement.five], "case 2 is true")
   .otherwise("nothing here")
   .onEnd((debug, result) => console.log(result)); // "case 1 is true"
 ```
@@ -171,7 +170,7 @@ const matchedResult = match({ name: "home" })
 
 console.log(matchedResult); // "just home"
 
-// event better, functional style XD
+// even better, functional style XD
 const evaluation = target => match({ target })
   .onMatch("home", "just home")
   .otherwise("nothing matched")
@@ -179,15 +178,13 @@ const evaluation = target => match({ target })
 
 console.log(evaluation("home")); // "just home"
 
-// coupled with array.filter
+// coupled with Array.prototype.filter
 const array = [ /* lots of different things */ ];
 const filtering = elem => match({ elem })
   .onMatchOR([ "case1", "case2", "case3"], true)
-  .otherwise(false)
   .onEnd((debug, result) => result);
 
 const newArray = array.filter(filtering);
-=======
->>>>>>> d73917c094774e22f85c261c0e791156f8ae4d21
 ```
 
+## Advanced Usage
