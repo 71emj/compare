@@ -309,7 +309,7 @@ const match = new Match(rules);
 const win = "window";
 
 // when passing simple expression SwitchCase will interpreted as literal string and escape it with quotes
-// which makes it safe to evaluate the expression
+// making it safe to evaluate the expressions like this. 
 match({ win })
   .onMatch("window", "correct")
   .otherwise("wrong")
