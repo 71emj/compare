@@ -4,21 +4,18 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
 
-## Features
-* Basic name-value matching similar to switch.
-* Multiple case matching, supporting || and && operators.
-* Allows infinite chaining, with exception of attaching methods to end case method, see [Ended](#compareendedcallbackdebug-result).
-* Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targes.
-* Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpression-value-callback).
-
 ## Installation
-Installation via npm
+Installation can be done via npm
 ```bash
 npm install --save case-compare
 ```
+or yarn
+```bash
+yarn add case-compare
+```
 
 ## Why should I give up switch? (or if/else)
-Before we start dicussing why is in general a bad pattern, let's look at some example code:
+Before we start dicussing why switch in general is a bad pattern, let's look at some example code:
 ```js
 const name = "home";
 
@@ -36,7 +33,7 @@ switch(name) {
     console.log("nothing matched");
 }; // "just home"
 ```
-To perform a simple name-value matching switch creates a giant code block filled with repetitive code that pretty much does the same thing, which not only does it waste your time whenever you tried to update a part of the snippets it causes the code base to have difficulty scaling/refactoring as your project grows in size. 
+To perform a simple name-value matching switch creates a giant code block filled with repetition that pretty much does the same thing, which not only does it waste your time whenever you tried to update a part of your logic it causes the code base to have difficulty scaling and debugging as your project grows in size. 
 
 To solve this, an alternative would be using object literal:
 ```js
@@ -51,9 +48,9 @@ console.log(matchingCase[name] || "nothing matched"); // "just home"
 ```
 This is a much better pattern in two important aspects:
 1. It's DRY
-2. It separates the part that does the evaluation and the part that does your awesome logic apart (means that you never have to change both of them at the same time, which is super awesome)
+2. It separates the part that does the evaluation and the part that does your awesome logic apart; meaning that you only have to update on at a time making it easier to scale and debug, which is super awesome.
 
-Unfortunately this pattern falls short when we start using it to evaluate a longer more complex expression, ex. x < y + 100 / z % 5; normally this kind of evaluation would be done using cleverly thought through if/else if/else, however pretty soon an if/else version of switch will become the public restroom of your otherwise beautiful code (wet and smell).
+Unfortunately this pattern falls short when we start using it to evaluate a longer, more complex expression, ex. x < y + 100 / z % 5; normally this kind of evaluation would be done using cleverly designed if/else, however pretty soon an if/else version of switch will become the public restroom (it's wet and it smells) of your otherwise beautiful code.
 
 ## Example
 Basic example
@@ -69,7 +66,14 @@ compare({ name: "home" })
   .toAllOther("nothing matched")
   .Ended((debug, result) => console.log(result)); // "just home"
 ``` 
-This is a code snippet created with the library, after creating an instance of the object user can pass whatever variable they wish to evaluate in the form of an object property (or if needed an array of objects). The variable (now a property of an object) will be evaluated against every expression(s) stated in each case, and once a match is found Compare will deliver the value (the second argument) associated with the case to a callback passed by the user.
+With Compare you can simply pass whatever variable(s) you wish to evaluate in the form of an object property (or if needed an array of objects). The variable (now a property of an object) will be evaluated against every expression(s) stated in each case, and once a match is found Compare will deliver the value (the second argument) associated with the case back to you.
+
+## Features
+* Basic name-value matching similar to switch.
+* Multiple case matching, supporting || and && operators.
+* Allows infinite chaining, with exception of attaching methods to end case method, see [Ended](#compareendedcallbackdebug-result).
+* Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targes.
+* Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpression-value-callback).
 
 ## List of Functions
 
