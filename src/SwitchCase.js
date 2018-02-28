@@ -40,13 +40,12 @@ class SwitchCase {
 
     const expr = this._setExpression(exp);
     const methods = {
-      OR: "_evaluateOR",
-      AND: "_evaluateAND",
-      SIMPLE: "_evaluateSingleCase"
+      SIMPLE: "_evaluateOne"
     };
-    const matching = flag === "SIMPLE"
-        ? this[methods[flag]](expr.get(0))
-        : this[methods[flag]](expr);
+
+    const matching = flag in methods 
+      ? this[methods[flag]](expr.get(0))
+      : this._evaluateMany(expr, flag);
 
     matching && this._break(values, fn);
     return this;
@@ -55,10 +54,10 @@ class SwitchCase {
   _beforeStart(exp) {
     const expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
     if (!this.testTargets) {
-      throw new TypeError("testTargets cannot be null or undefined");
+      throw new TypeError("TestTargets cannot be null or undefined");
     }
     if (!expcheck) {
-      throw new TypeError("the first argument of match must be a string, array of string, or a function");
+      throw new TypeError("An expression must be a string, array of string, or a function");
     }
     return;
   }
@@ -88,21 +87,23 @@ class SwitchCase {
     return expressions;
   }
 
-  _evaluateAND(expressions) {
-    for (let i = 0; i < expressions.size; i++) {
-      if (!this._evaluateSingleCase(expressions.get(i))) return false;
+  _evaluateMany(expr, flag) {
+    const boolSet = {
+      "OR": [true, false],
+      "AND": [false, true]
+    };
+    if (!(flag in boolSet)) {
+      throw new Error("Requested task is not a valid type in this method");
     }
-    return true;
+    for (let i = 0; i < expr.size; i++) {
+      if (boolSet[flag][0] ? this._evaluateOne(expr.get(i)) : !this._evaluateOne(expr.get(i))) { 
+        return boolSet[flag][0];
+      }
+    }
+    return boolSet[flag][1];
   }
 
-  _evaluateOR(expressions) {
-    for (let i = 0; i < expressions.size; i++) {
-      if (this._evaluateSingleCase(expressions.get(i))) return true;
-    }
-    return false;
-  }
-
-  _evaluateSingleCase(expression) {
+  _evaluateOne(expression) {
     const testTargets = this.testTargets;
     return this._matchingExpression(expression, testTargets);
   }
@@ -124,7 +125,7 @@ class SwitchCase {
     const statement = "return " + expression;
 
     if (this._filter(expression)) { 
-      throw new Error("expression must be single-statement-only"); 
+      throw new Error("Expression must be single-statement-only"); 
     }
 
     testTargets.forEach((value, key) => {

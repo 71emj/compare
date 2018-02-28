@@ -127,4 +127,13 @@ describe("test native methods of SwitchCase", () => {
     ).toThrowError("Expression must be single-statement-only");
   });
 
+  test("passing the wrong type of expression, or not passing at all will receive error", () => {
+    expect(
+      caseSwitch
+        .setTargets({ name })
+        .match(null, "something cool", "SIMPLE")
+        .match("true", "It's something else", "SIMPLE")
+        .end((debug, result) => console.log(result))
+    ).toThrowError("An expression must be a string, array of string, or a function");
+  });
 });
