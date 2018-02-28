@@ -284,7 +284,7 @@ compare({ type: query[1], value: query[2] })
 As shown in the example above, callback perform a specific action to fetch data unknown to the author and pass it back which can then be used in the same code block. <br/>
 <br/>
 note the argument, val, passed in the callback is in fact the value stated as second argument if provided.
-``` js 
+```js 
 .toCase("case", "hello world", val => {
   console.log(val);
 }) // "hello world"

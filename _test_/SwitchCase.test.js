@@ -109,7 +109,10 @@ describe("test native methods of SwitchCase", () => {
         return "It's my home";
       }, "SIMPLE")
       .match("true", "It's something else", "SIMPLE")
-      .end((debug, result) => expect(result).toBe("It's my home"));
+      .end((debug, result) => {
+        debug();
+        expect(result).toBe("It's my home")
+      });
   });
 
   test("each expression can only be single statement", () => {

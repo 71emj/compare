@@ -14,9 +14,12 @@ function Compare(config) {
 	const rules = Object.assign(securityConfig, config);
 
 	function Wrapper(args) {
-		if (!args) throw new Error("argument cannot be empty");
-		if (typeof arguments[0] !== "object") throw new TypeError("Variable must be an object, or an array of objects");
-
+		if (!args) { 
+			throw new Error("argument cannot be empty");
+		}
+		if (typeof arguments[0] !== "object") { 
+			throw new TypeError("Variable must be an object, or an array of objects"); 
+		}
 		const targets = Array.isArray(args) ? args : Array.from(arguments);
 		const argIsSimple = Object.keys(args).length === 1;
 		
@@ -56,10 +59,12 @@ function Compare(config) {
   		}
 
 		  _interpret(exprs) {
-		  	if (this._screen(exprs)) throw new Error(
-		  		`individual expression must not exceed more than ${rules.limit} characters ` 
-		  		+ `and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
-		  	);
+		  	if (this._screen(exprs)) { 
+		  		throw new Error(
+		  			`individual expression must not exceed more than ${rules.limit} characters ` 
+		  			+ `and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
+		  		);
+		  	}
 		  	return this.simpleExp ? this._verbose(exprs) : exprs;
 		  }
 
@@ -70,24 +75,29 @@ function Compare(config) {
 		  	const len = exprs.length;
 		  	const pattern = `${rules.keywords.join("|")}|.{${rules.limit},}`;
 		  	const regexp = new RegExp(pattern);
-
 		  	for (let i = 0; i < len; i++) {
-		  		if (typeof exprs[i] === "function") continue;
-		  		if (regexp.test(exprs[i])) return true;
+		  		if (typeof exprs[i] === "function") { 
+		  			continue; 
+		  		}
+		  		if (regexp.test(exprs[i])) { 
+		  			return true; 
+		  		}
 		  	}
 		  	return false;
 		  }
 
 		  _verbose(exprs) {
-		  	if (typeof exprs === "function") return exprs; 
+		  	if (typeof exprs === "function") { 
+		  		return exprs;
+		  	}
 
 		  	if (!Array.isArray(exprs)) {
 		  		exprs = [ exprs ];
 		  	}
 
 				const name = this.testTargets.entries().next(0).value[0];
+				// mathcing "value", "operator", "followed value"
 				const mapping = expression => {
-					// mathcing "value", "operator", "followed value"
 					const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/); 
 					return simple ? `${name} ${simple[2] || "==="} "${simple[1] || simple[3]}"` : expression;
 		  	};
