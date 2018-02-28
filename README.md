@@ -17,8 +17,8 @@ Installation via npm
 npm install --save case-compare
 ```
 
-## Why should I give up switch? (or if/else if/else)
-Before we start dicussing why I consider switch a bad pattern, let's look at some example code:
+## Why should I give up switch? (or if/else)
+Before we start dicussing why is in general a bad pattern, let's look at some example code:
 ```js
 const name = "home";
 
