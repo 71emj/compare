@@ -324,3 +324,6 @@ compare({ win })
   .toAllOther("wrong")
   .Ended((debug, result) => console.log(result)); // correct
 ```
+
+## License
+MIT
