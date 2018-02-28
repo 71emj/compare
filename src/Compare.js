@@ -87,7 +87,7 @@ function Compare(config) {
 
 				const name = this.testTargets.entries().next(0).value[0];
 				const mapping = expression => {
-					const simple = expression.toString().match(/^\b\w+\b$|^[><=]={1,2}[\s\w]+$/); 
+					const simple = expression.toString().match(/^\b\w+\b$|^[><=]={0,2}[\s\d]+$/); 
 					return simple ? `${name} === "${simple}"` : expression;
 		  	};
 

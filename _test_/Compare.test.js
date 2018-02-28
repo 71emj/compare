@@ -162,6 +162,23 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		const newArray = array.filter(filtering);
 		expect(newArray).toEqual(["yellow", "violet"]);
 	});
+
+	test("simple expression should support mathematic evaluation shorhand", () => {
+    const num1 = 100;
+    const num2 = 200;
+		
+		compare({ num1 })
+			.toCase("<= 15", false)
+			.toCase(">= 50", true)
+			.toAllOther("wierd should match")
+			.Ended((debug, result) => expect(true).toBe(true));
+
+		compare({ num1 })
+			.toCase("< 15", false)
+			.toCase(">= 50", true)
+			.toAllOther("wierd should match")
+			.Ended((debug, result) => expect(true).toBe(true));
+  });
 });
 
 // a good security check is limiting expression to be 
