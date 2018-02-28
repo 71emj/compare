@@ -323,7 +323,6 @@ There are however a few security measures implemented into Compare.
 * An open-close parenthesis in any part of the string are not allowed
 * Keywords such as "window", "document", "process" etc. (list can go on) are not allowed
 * Each expression has limited length default to 50 characters (the idea is, if it's too long better split it up, also prevent endless chaining)
-* ...open to more suggestion
 
 Custom rules regarding keywords and word length screening can be passed as config object when importing Compare into your project.
 ```js
