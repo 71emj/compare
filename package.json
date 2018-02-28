@@ -1,7 +1,7 @@
 {
   "name": "case-compare",
   "version": "1.0.0",
-  "description": "A javascript library for alternative switch",
+  "description": "An alternative to vanilla switch",
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll"
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/71emj/compare.git"
   },
-  "author": "71emj",
+  "author": "71emj, Timothy Jeng",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/71emj/compare/issues"
