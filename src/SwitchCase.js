@@ -116,7 +116,7 @@ class SwitchCase {
   _filter(expression) {
     return typeof expression === "function"
       ? false
-      : !!expression.match(/[\w]+(?=\(.+\)|\([^-+*%/]+\))|{.+}|.+;.+/);
+      : !!expression.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/);
   }
 
   _matchingExpression(expression, testTargets) {
@@ -127,12 +127,10 @@ class SwitchCase {
     if (this._filter(expression)) { 
       throw new Error("Expression must be single-statement-only"); 
     }
-
     testTargets.forEach((value, key) => {
       args.push(key);
       values.push(value);
     });
-
     const functionExp = typeof expression === "function"
         ? expression
         : new Function(...args, statement);
