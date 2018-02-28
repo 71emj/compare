@@ -163,7 +163,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		expect(newArray).toEqual(["yellow", "violet"]);
 	});
 
-	test("simple expression should support mathematic evaluation shorhand", () => {
+	test("simple expression should support arithmatic evaluation shorhand", () => {
     const num1 = 100;
     const num2 = 200;
 		
@@ -171,13 +171,13 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toCase("<= 15", false)
 			.toCase(">= 50", true)
 			.toAllOther("wierd should match")
-			.Ended((debug, result) => expect(true).toBe(true));
+			.Ended((debug, result) => expect(result).toBe(true));
 
 		compare({ num1 })
 			.toCase("< 15", false)
 			.toCase(">= 50", true)
 			.toAllOther("wierd should match")
-			.Ended((debug, result) => expect(true).toBe(true));
+			.Ended((debug, result) => expect(result).toBe(true));
   });
 });
 
