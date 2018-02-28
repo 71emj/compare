@@ -9,9 +9,9 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 ## Features
 * Basic name-value matching similar to switch.
 * Multiple case matching, supporting || and && operators.
-* Allows infinite chaining, with exception of attaching methods to end case method (see Ended()).
-* Basic debug function passed as first argument in end case method (see Ended()), allowed user to see the parameters passed as matching targes.
-* Individual case can take second/third argument as variable/callback/both see [toCase()](#.toCase).
+* Allows infinite chaining, with exception of attaching methods to end case method see [Ended()](#compareendedcallbackdebug-result).
+* Basic debug function passed as first argument in end case method (see [Ended()](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targes.
+* Individual case can take second/third argument as variable/callback/both see [toCase()](#comparetocaseorexpressions-value-callback).
 
 ## Installation
 Installation via npm
@@ -60,17 +60,17 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 
 | Function | Description |
 |:--- |:--- | 
-| toCase | toCase matches variables to expression specified as first argument of the function. |
-| toCaseOR | toCaseOR matches variables to an array of expressions and match if any of the expressions is truthful |
-| toCaseAND | toCaseAND is similar to toCaseOR, but will only match if all expressions are truthful |
-| toAllOther | toAllOther is an equivalent method to default in switch |
-| Ended | Ended breaks out the evaulation chain and takes a callback to perform action on matched cases |
+| [toCase()](#comparetocaseorexpressions-value-callback) | toCase matches variables to expression specified as first argument of the function. |
+| [toCaseOR()](#comparetocaseorexpressions-value-callback) | toCaseOR matches variables to an array of expressions and match if any of the expressions is truthful |
+| [toCaseAND()](#comparetocaseandexpressions-value-callback) | toCaseAND is similar to toCaseOR, but will only match if all expressions are truthful |
+| [toAllOther](#comparetoallothervalue-callback) | toAllOther is an equivalent method to default in switch |
+| [Ended()](#compareendedcallbackdebug-result) | Ended breaks out the evaulation chain and takes a callback to perform action on matched cases |
 
 ## APIs
 Following contents are a list of methods for utilizing Compare
 
-### .toCase(expression[, value[, callback]])
-toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see toCaseOR(), toCaseAND for multiple expression evaluation).
+### Compare.toCase(expression[, value[, callback]])
+toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see [toCaseOR()](#comparetocaseorexpressions-value-callback), [toCaseAND()](#comparetocaseandexpressions-value-callback) for multiple expression evaluation).
 
 ``` js
 // this is valid
