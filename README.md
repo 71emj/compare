@@ -9,7 +9,7 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 * Multiple case matching, supporting || and && operators.
 * Allows infinite chaining, with exception of attaching methods to end case method, see [Ended](#compareendedcallbackdebug-result).
 * Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targes.
-* Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpressions-value-callback).
+* Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpression-value-callback).
 
 ## Installation
 Installation via npm
@@ -17,24 +17,8 @@ Installation via npm
 npm install --save case-compare
 ```
 
-## Examples
-Basic example
-
-```js
-const Compare = require("case-compare");
-const compare = new Compare();
-
-compare({ name: "home" })
-  .toCase("myhome", "not my home")
-  .toCase("hishome", "not his home")
-  .toCase("home", "just home")
-  .toAllOther("nothing matched")
-  .Ended((debug, result) => console.log(result)); // "just home"
-``` 
-
-The example above show case a pattern similar to javascript "switch", with the exception that Compare allows user to pass variable as second argument of each cases and write the logic at the end of all evaluations.
-
-vanilla switch in equivalent evaluation:
+## Why should I give up switch? (or if/else if/else)
+Before we start dicussing why I consider switch a bad pattern, let's look at some example code:
 ```js
 const name = "home";
 
@@ -52,13 +36,46 @@ switch(name) {
     console.log("nothing matched");
 }; // "just home"
 ```
-it is unnecessary verbose and prone to mistakes such as forgetting "break" at the end of each cases.
+To perform a simple name-value matching switch creates a giant code block filled with repetitive code that pretty much does the same thing, which not only does it waste your time whenever you tried to update a part of the snippets it causes the code base to have difficulty scaling/refactoring as your project grows in size. 
+
+To solve this, an alternative would be using object literal:
+```js
+const name = "home";
+const matchingCase = {
+	myhome: "not my home",
+	hishome: "not his home",
+	home: "just home"
+};
+
+console.log(matchingCase[name] || "nothing matched"); // "just home"
+```
+This is a much better pattern in two important aspects:
+1. It's DRY
+2. It separates the part that does the evaluation and the part that does your awesome logic apart (means that you never have to change both of them at the same time, which is super awesome)
+
+Unfortunately this pattern falls short when we start using it to evaluate a longer more complex expression, ex. x < y + 100 / z % 5; normally this kind of evaluation would be done using cleverly thought through if/else if/else, however pretty soon an if/else version of switch will become the public restroom of your otherwise beautiful code (wet and smell).
+
+## Example
+Basic example
+
+```js
+const Compare = require("case-compare");
+const compare = new Compare();
+
+compare({ name: "home" })
+  .toCase("myhome", "not my home")
+  .toCase("hishome", "not his home")
+  .toCase("home", "just home")
+  .toAllOther("nothing matched")
+  .Ended((debug, result) => console.log(result)); // "just home"
+``` 
+This is a code snippet created with the library, after creating an instance of the object user can pass whatever variable they wish to evaluate in the form of an object property (or if needed an array of objects). The variable (now a property of an object) will be evaluated against every expression(s) stated in each case, and once a match is found Compare will deliver the value (the second argument) associated with the case to a callback passed by the user.
 
 ## List of Functions
 
 | Function | Description |
 |:--- |:--- | 
-| [toCase](#comparetocaseexpressions-value-callback) | toCase matches variables to expression specified as first argument of the function. |
+| [toCase](#comparetocaseexpression-value-callback) | toCase matches variables to expression specified as first argument of the function. |
 | [toCaseOR](#comparetocaseorexpressions-value-callback) | toCaseOR matches variables to an array of expressions and match if any of the expressions is truthful |
 | [toCaseAND](#comparetocaseandexpressions-value-callback) | toCaseAND is similar to toCaseOR, but will only match if all expressions are truthful |
 | [toAllOther](#comparetoallothervalue-callback) | toAllOther is an equivalent method to default in switch |
@@ -163,8 +180,10 @@ compare({ home: null })
 ```
 
 ### Compare.Ended(callback(debug, result))
-Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, Ended method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase* methods should be use instead).<br/>
-<br/>
+Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. 
+
+However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, Ended method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase* methods should be use instead).
+
 In addition an optional return can be used in the callback function, tranforming the evaluation chain into an expression.
 
 ```js
