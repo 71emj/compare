@@ -47,14 +47,14 @@ describe("test native methods of SwitchCase", () => {
     caseSwitch
       .setTargets(params)
       .match([`winScrollY < winHeight - 200`], "case 1 is true", "SIMPLE")
-      .otherwise("I lied it's false")
+      .match("true", "I lied it's false", "SIMPLE")
       .end((debug, vals) => expect(vals).toBe("I lied it's false"));
 
     params.winHeight = 200;
     caseSwitch
       .setTargets(params)
       .match([`winScrollY < winHeight - 200`, `winScrollY > winHeight - 200`], "case 1 is true", "OR")
-      .otherwise("I lied it's false")
+      .match("true", "I lied it's false", "SIMPLE")
       .end((debug, vals) => expect(vals).toBe("case 1 is true"));
   });
 
@@ -95,7 +95,7 @@ describe("test native methods of SwitchCase", () => {
     caseSwitch
       .setTargets({ name })
       .match(exp, "It's home", "SIMPLE")
-      .otherwise("It's something else")
+      .match("true", "It's something else", "SIMPLE")
       .end((debug, result) => expect(result).toBe("It's home"));
   });
 
@@ -108,7 +108,7 @@ describe("test native methods of SwitchCase", () => {
       .match(exp, "It's home", result => {
         return "It's my home";
       }, "SIMPLE")
-      .otherwise("It's something else")
+      .match("true", "It's something else", "SIMPLE")
       .end((debug, result) => expect(result).toBe("It's my home"));
   });
 
@@ -119,7 +119,7 @@ describe("test native methods of SwitchCase", () => {
       caseSwitch
         .setTargets({ name })
         .match(`() => { name = document.createElement("i"); name.onblur = "something" }`, "something cool", "SIMPLE")
-        .otherwise("It's something else")
+        .match("true", "It's something else", "SIMPLE")
         .end((debug, result) => console.log(result))
     ).toThrowError("Expression must be single-statement-only");
   });

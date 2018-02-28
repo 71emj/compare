@@ -50,11 +50,6 @@ class SwitchCase {
     return this;
   }
 
-  otherwise(values, fn) {
-    this.match("true", values, fn, "SIMPLE");
-    return this;
-  }
-
   end(fn) {
     const debug = () => {
       console.log(this.testTargets);
