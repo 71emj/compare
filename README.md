@@ -51,6 +51,15 @@ switch(name) {
 ```
 it is unnecessary verbose and prone to mistakes such as forgetting "break" at the end of each cases.
 
+## List of Functions
+
+| Function | Description |
+|:--- |:--- | 
+| toCase | toCase matches variables to expression specified as first argument of the function. |
+| toCaseOR | toCaseOR matches variables to an array of expressions and match if any of the expressions is truthful |
+| toCaseAND | toCaseAND is similar to toCaseOR, but will only match if all expressions are truthful |
+| toAllOther | toAllOther is an equivalent method to default in switch |
+| Ended | Ended breaks out the evaulation chain and takes a callback to perform action on matched cases |
 
 ## APIs
 Following contents are a list of methods for utilizing Compare
