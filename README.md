@@ -11,7 +11,7 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 * Multiple case matching, supporting || and && operators.
 * Allows infinite chaining, with exception of attaching methods to end case method (see Ended()).
 * Basic debug function passed as first argument in end case method (see Ended()), allowed user to see the parameters passed as matching targes.
-* Individual case can take second/third argument as variable/callback/both(in order of value, cb) (see toCase()).
+* Individual case can take second/third argument as variable/callback/both see [toCase()](##.toCase).
 
 ## Installation
 Installation via npm
@@ -69,7 +69,7 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 ## APIs
 Following contents are a list of methods for utilizing Compare
 
-### Compare.toCase(expression[, value[, callback]])
+### .toCase(expression[, value[, callback]])
 toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see toCaseOR(), toCaseAND for multiple expression evaluation).
 
 ``` js
