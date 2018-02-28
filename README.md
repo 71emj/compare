@@ -50,7 +50,7 @@ This is a much better pattern in two important aspects:
 1. It's DRY
 2. It separates the part that does the evaluation and the part that does your awesome logic apart; meaning that you only have to update on at a time making it easier to scale and debug, which is super awesome.
 
-Unfortunately this pattern falls short when we start using it to evaluate a longer, more complex expression, ex. x < y + 100 / z % 5; normally this kind of evaluation would be done using cleverly designed if/else, however pretty soon an if/else version of switch will become the public restroom (it's wet and it smells) of your otherwise beautiful code.
+Unfortunately this pattern falls short when we start using it to evaluate a longer, more complex expression such as x < y + 100 / z % 5. Normally this kind of evaluation would be done using cleverly designed if/else, however pretty soon an if/else version of switch will become the public restroom (it's wet and it smells) of your otherwise beautiful code.
 
 ## Example
 Basic example
