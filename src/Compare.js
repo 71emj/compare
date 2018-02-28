@@ -52,8 +52,9 @@ function Compare(config) {
 		  }
 
 		  Ended(fn) {
-    		const debug = () => {
-      		console.log(this.testTargets);
+    		const debug = options => {
+    			const targets = this.testTargets;
+    			console.log(options ? targets[options] : targets);
     		}
     		return fn(debug, this.result);
   		}
@@ -95,7 +96,8 @@ function Compare(config) {
 		  		exprs = [ exprs ];
 		  	}
 
-				const name = this.testTargets.entries().next(0).value[0];
+				// const name = this.testTargets.entries().next(0).value[0];
+				const name = this.testTargets.args[0];
 				// mathcing "value", "operator", "followed value"
 				const mapping = expression => {
 					const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/); 

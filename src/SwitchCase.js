@@ -23,8 +23,14 @@ class SwitchCase {
     for (let i = 0; i < len; i++) {
       temp = Object.assign(temp, targets[i]);
     }
-    const setObjToMap = (map, elem) => map.set(elem[0], elem[1]);
-    this.testTargets = Object.entries(temp).reduce(setObjToMap, new Map());
+    const collection = { targets: new Map(), args: [], values: [] };
+    const setObjToMap = (collection, elem) => { 
+      collection.targets.set(elem[0], elem[1]);
+      collection.args.push(elem[0]);
+      collection.values.push(elem[1]);
+      return collection;
+    };
+    this.testTargets = Object.entries(temp).reduce(setObjToMap, collection);
     return this;
   }
 
@@ -39,9 +45,7 @@ class SwitchCase {
     [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
 
     const expr = this._setExpression(exp);
-    const methods = {
-      SIMPLE: "_evaluateOne"
-    };
+    const methods = { SIMPLE: "_evaluateOne" };
 
     const matching = flag in methods 
       ? this[methods[flag]](expr.get(0))
@@ -51,6 +55,13 @@ class SwitchCase {
     return this;
   }
 
+  end(fn) {
+    const debug = () => {
+      console.log(this.testTargets);
+    };
+    return fn(debug, this.result);
+  }
+  
   _beforeStart(exp) {
     const expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
     if (!this.testTargets) {
@@ -61,14 +72,7 @@ class SwitchCase {
     }
     return;
   }
-
-  end(fn) {
-    const debug = () => {
-      console.log(this.testTargets);
-    };
-    return fn(debug, this.result);
-  }
-
+  
   _break(val, fn) {
     this.isMatched = true;
     this.result = typeof fn === "function" ? fn(val) : val;
@@ -119,23 +123,17 @@ class SwitchCase {
       : !!expression.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/);
   }
 
-  _matchingExpression(expression, testTargets) {
-    const args = [];
-    const values = [];
+  _matchingExpression(expression, { args, values }) {
     const statement = "return " + expression;
-
     if (this._filter(expression)) { 
       throw new Error("Expression must be single-statement-only"); 
     }
-    testTargets.forEach((value, key) => {
-      args.push(key);
-      values.push(value);
-    });
     const functionExp = typeof expression === "function"
         ? expression
         : new Function(...args, statement);
-
-    return functionExp(...values);
+    
+    try { return functionExp(...values); } 
+    catch(err) { throw err; }
   }
 }
 

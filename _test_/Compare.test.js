@@ -179,6 +179,13 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toAllOther("wierd should match")
 			.Ended((debug, result) => expect(result).toBe(true));
   });
+
+  test("debug accepts an option string to direct console output", () => {
+		compare({ name: "home" })
+			.toCase("name === 'home'", "It's true!!")
+			.toAllOther("It's false")
+			.Ended((debug, result) => expect(debug()).toBe(console));
+  });
 });
 
 // a good security check is limiting expression to be 

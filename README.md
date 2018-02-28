@@ -11,7 +11,7 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 * Multiple case matching, supporting || and && operators.
 * Allows infinite chaining, with exception of attaching methods to end case method, see [Ended](#compareendedcallbackdebug-result).
 * Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targes.
-* Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseorexpressions-value-callback).
+* Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpressions-value-callback).
 
 ## Installation
 Installation via npm
@@ -60,7 +60,7 @@ it is unnecessary verbose and prone to mistakes such as forgetting "break" at th
 
 | Function | Description |
 |:--- |:--- | 
-| [toCase](#comparetocaseorexpressions-value-callback) | toCase matches variables to expression specified as first argument of the function. |
+| [toCase](#comparetocaseexpressions-value-callback) | toCase matches variables to expression specified as first argument of the function. |
 | [toCaseOR](#comparetocaseorexpressions-value-callback) | toCaseOR matches variables to an array of expressions and match if any of the expressions is truthful |
 | [toCaseAND](#comparetocaseandexpressions-value-callback) | toCaseAND is similar to toCaseOR, but will only match if all expressions are truthful |
 | [toAllOther](#comparetoallothervalue-callback) | toAllOther is an equivalent method to default in switch |
