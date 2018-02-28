@@ -184,14 +184,6 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		compare({ name: "home" })
 			.toCase("name === 'home'", "It's true!!")
 			.toAllOther("It's false")
-			.Ended((debug, result) => expect(debug()).toBe(console));
+			.Ended((debug, result) => debug("targets"));
   });
 });
-
-// a good security check is limiting expression to be 
-// single expression, i.e. no more than one semi-column
-// and add basic regexp check to further filter out dangerous code
-// for example no "document", "process", "window" etc.
-
-
-// naming --> compare, equal, toCase 
