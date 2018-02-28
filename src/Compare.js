@@ -1,4 +1,4 @@
-import SwitchCase from "./SwitchCase";
+const SwitchCase = require("./SwitchCase");
 
 function Compare(config) {
 	"use strict";
@@ -106,4 +106,4 @@ function Compare(config) {
 	return Wrapper;
 }
 
-export default Compare;
+module.exports = Compare;

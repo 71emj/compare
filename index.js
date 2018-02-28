@@ -1,3 +1,3 @@
-import Compare from "./src/Compare";
+const Compare = require("./src/Compare");
 
 module.exports = Compare;

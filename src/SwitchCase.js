@@ -132,4 +132,4 @@ class SwitchCase {
   }
 }
 
-export default SwitchCase;
+module.exports = SwitchCase;

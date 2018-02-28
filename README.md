@@ -1,4 +1,5 @@
 # Compare/Case-Compare
+
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
 
 <strong>note on naming: </strong>naming is pretty much settled at this point, minor changes might applied to method names but should stay consistent to current naming pattern. 
@@ -11,14 +12,16 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 * Individual case can take second/third argument as variable/callback/both(in order of value, cb) (see toCase()).
 
 ## Installation
-installation via npm or cdn is not currently supported as it is still in development.
-For developers interested in the project can download it via git clone.
+installation via npm
+``` 
+npm install --save case-compare
+```
 
 ## Examples
 Basic example
 
 ``` javascript
-const Compare = require("./index");
+const Compare = require("case-compare");
 const compare = new Compare();
 
 compare({ name: "home" })
@@ -301,7 +304,7 @@ There are however a few security measures implemented into Compare.
 
 Custom rules regarding keywords and word length screening can be passed as config object when importing Compare into your project.
 ``` javascript
-const Compare = require("./index");
+const Compare = require("case-compare");
 const rules = { limit: 50, keywords: ["document", "window", "process"] }; // the value here are set in default, you can custom the rules to your preference
 const compare = new Compare(rules);
 const win = window;

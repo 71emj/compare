@@ -1,4 +1,4 @@
-import Compare from "../src/Compare";
+import Compare from "../index";
 
 describe("test Compare, a wrapper of SwitchCase", () => {
 	let compare;
