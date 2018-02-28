@@ -39,9 +39,9 @@ To solve this, an alternative would be using object literal:
 ```js
 const name = "home";
 const matchingCase = {
-	myhome: "not my home",
-	hishome: "not his home",
-	home: "just home"
+  myhome: "not my home",
+  hishome: "not his home",
+  home: "just home"
 };
 
 console.log(matchingCase[name] || "nothing matched"); // "just home"
