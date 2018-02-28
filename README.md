@@ -1,5 +1,7 @@
 # Compare/Case-Compare
 
+[![npm version](https://badge.fury.io/js/case-compare.svg)](https://badge.fury.io/js/case-compare)
+
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
 
 <strong>note on naming: </strong>naming is pretty much settled at this point, minor changes might applied to method names but should stay consistent to current naming pattern. 
@@ -12,7 +14,7 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 * Individual case can take second/third argument as variable/callback/both(in order of value, cb) (see toCase()).
 
 ## Installation
-installation via npm
+Installation via npm
 ``` 
 npm install --save case-compare
 ```
