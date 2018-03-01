@@ -19,18 +19,17 @@ class SwitchCase {
 
   setTargets(...targets) {
     const len = targets.length;
-    let temp = {};
-    for (let i = 0; i < len; i++) {
-      temp = Object.assign(temp, targets[i]);
-    }
-    const collection = { targets: new Map(), args: [], values: [] };
+    const collection = { targets: {}, args: [], values: [] };
+
+    const setArrToObj = (obj, item) => Object.assign(obj, item);
     const setObjToMap = (collection, elem) => { 
-      collection.targets.set(elem[0], elem[1]);
       collection.args.push(elem[0]);
       collection.values.push(elem[1]);
       return collection;
     };
-    this.testTargets = Object.entries(temp).reduce(setObjToMap, collection);
+
+    collection.targets = targets.reduce(setArrToObj, {});
+    this.testTargets = Object.entries(collection.targets).reduce(setObjToMap, collection);
     return this;
   }
 
@@ -123,16 +122,20 @@ class SwitchCase {
       : !!expression.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/);
   }
 
-  _matchingExpression(expression, { args, values }) {
+  _matchingExpression(expression, { targets, args, values }) {
     const statement = "return " + expression;
     if (this._filter(expression)) { 
       throw new Error("Expression must be single-statement-only"); 
     }
-    const functionExp = typeof expression === "function"
+    const functionExp = /*typeof expression === "function"
         ? expression
-        : new Function(...args, statement);
+        :*/ new Function(...args, statement);
     
-    try { return functionExp(...values); } 
+    try { 
+      return typeof expression === "function" 
+      ? expression(targets)
+      : functionExp(...values); 
+    } 
     catch(err) { throw err; }
   }
 }

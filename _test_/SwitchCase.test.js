@@ -90,7 +90,7 @@ describe("test native methods of SwitchCase", () => {
 
   test("match also accepts function as first argument", () => {
     const name = "home";
-    const exp = name => name === "home";
+    const exp = ({ name }) => name === "home";
 
     caseSwitch
       .setTargets({ name })
@@ -101,7 +101,7 @@ describe("test native methods of SwitchCase", () => {
 
   test("returning value in a match case callback is the same as passing value as second argument", () => {
     const name = "home";
-    const exp = name => name === "home";
+    const exp = ({ name }) => name === "home";
 
     caseSwitch
       .setTargets({ name })

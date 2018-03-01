@@ -25,7 +25,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 	});
 
 	test("single name-value pair expression, should automatically interpreted as variable === home with single target", () => {
-		const exp = name => typeof name === "string";
+		const exp = ({ home }) => typeof home === "string";
 
 		compare({ home: "home" })
 			.toCase("myhome", "not true")
@@ -76,7 +76,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 	});
 
 	test("mix expression types: simple, verbose, array, function, in a single chain is supported", () => {
-		const exp = num => +num;
+		const exp = ({ home, city }) => +home;
 		const params = {
 			home: "Taiwan",
 			city: "Charlotte"
@@ -93,8 +93,8 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.Ended((debug, result) => expect(result).toBe("compareing AND"));
 	});
 
-	test("function as expression argument will only take the first property of the target object", () => {
-		const exp = num => +num;
+	test("function as expression takes in an object contains all parameters pass originally", () => {
+		const exp = ({ number }) => +number;
 		const params = {
 			home: "Taiwan",
 			city: "Charlotte",
@@ -103,21 +103,6 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		
 		compare(params)
 			.toCase(exp, "it's number")
-			.toCaseOR([exp, "city === 'Kaohsiung'"], "still not compare")
-			.toAllOther("no compare found")
-			.Ended((debug, result) => expect(result).toBe("no compare found"));
-
-		// to be able to check all the variables, user must create a loop themselves
-		// such function will need to leverage arguments or rest syntax
-		const expression = (...args) => {
-			for (let i = 0; i < args.length; i++) {
-				if (+args[i]) return true;
-			}
-			return false;
-		}
-
-		compare(params)
-			.toCase(expression, "it's number")
 			.toCaseOR([exp, "city === 'Kaohsiung'"], "still not compare")
 			.toAllOther("no compare found")
 			.Ended((debug, result) => expect(result).toBe("it's number"));
@@ -156,7 +141,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 	test("use SwitchCase along with Array methods", () => {
 		const array = [ "red", "blue", "yellow", 1, 2, "violet" ];
 		const filtering = elem => compare({ elem })
-  		.toCaseAND(["!+elem", "elem.length >= 4", elem => elem.match(/o/)], true)
+  		.toCaseAND(["!+elem", "elem.length >= 4", ({ elem }) => elem.match(/o/)], true)
   		.Ended((debug, result) => result);
 
 		const newArray = array.filter(filtering);
@@ -183,6 +168,17 @@ describe("test Compare, a wrapper of SwitchCase", () => {
   test("debug accepts an option string to direct console output", () => {
 		compare({ name: "home" })
 			.toCase("name === 'home'", "It's true!!")
+			.toAllOther("It's false")
+			.Ended((debug, result) => debug("targets"));
+  });
+
+  test("with rest syntax custom function should be able to use any variables", () => {
+		const exp = ({ name, gender }) => { 
+			console.log({ name, gender });
+		}
+
+		compare({ name: "home", gender: "male" })
+			.toCase(exp, "It's true!!")
 			.toAllOther("It's false")
 			.Ended((debug, result) => debug("targets"));
   });

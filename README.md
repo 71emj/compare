@@ -2,7 +2,11 @@
 
 [![npm version](https://badge.fury.io/js/case-compare.svg)](https://badge.fury.io/js/case-compare)
 
+<strong>Important update to v1.1.0: </strong>see [Passing function as expression](#passing-function-as-expression).
+
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
+
+<strong>Friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
 ## Installation
 Installation can be done via npm
@@ -33,7 +37,7 @@ switch(name) {
     console.log("nothing matched");
 }; // "just home"
 ```
-To perform a simple name-value matching switch creates a giant code block filled with repetition that pretty much does the same thing, which not only does it waste your time whenever you tried to update a part of your logic it causes the code base to have difficulty scaling and debugging as your project grows in size. 
+To perform a simple name-value matching switch creates a giant code block filled with repetition that pretty much does the same thing; which not only does it waste your time whenever you tried to update a part of your logic, it causes the code base to have difficulty scaling and debugging as your project grows in size. 
 
 To solve this, an alternative would be using object literal:
 ```js
@@ -43,14 +47,13 @@ const matchingCase = {
   hishome: "not his home",
   home: "just home"
 };
-
 console.log(matchingCase[name] || "nothing matched"); // "just home"
 ```
 This is a much better pattern in two important aspects:
 1. It's DRY
 2. It separates the part that does the evaluation and the part that does your awesome logic apart; meaning that you only have to update on at a time making it easier to scale and debug, which is super awesome.
 
-Unfortunately this pattern falls short when we start using it to evaluate a longer, more complex expression such as x < y + 100 / z % 5. Normally this kind of evaluation would be done using cleverly designed if/else, however pretty soon an if/else version of switch will become the public restroom (it's wet and it smells) of your otherwise beautiful code.
+Unfortunately this pattern falls short when we start using it to evaluate a longer, more complex expression such as x < y + 100 / z % 5. Normally this type of evaluation would be done using cleverly designed if/else statement; however as your evaluation grows in size so is the difficulty of modifying that chunk of code is, pretty soon you'll be facing a giant pile of goo that's sitting around in your otherwise nice beautiful house that no one wants to touch.
 
 ## Example
 Basic example
@@ -136,7 +139,7 @@ compare({ home: "home", name: "71emj" })
   .toAllOther("nothing here")
   .Ended((debug, result) => console.log(result)); // "case 2 is true"
 
-// the use case of toCaseOR can be extended to mathematical evaluations
+// the use case of toCaseOR can be extended to arithmetic evaluations
 compare({ num1: 1000, num2: 2000 })
   .toCaseOR([ "num1 + 200 > num2", "num1 * 2 < num2" ], "case 1 is true")
   .toCaseOR([ "num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2" ], "case 2 is true")
@@ -226,7 +229,7 @@ const newArray = array.filter(filtering);
 
 ## Advance Features
 
-### Passing a function as expression
+### Passing function as expression
 
 Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format.
 
@@ -260,10 +263,9 @@ request("some url", (err, response, body) => {
 
 If you wish to use Compare on unknown source this is a preferable pattern, as it gives you more room for security measure.
 
-<strong>note: </strong>when using the function-as-evaluation pattern, in order to access all/specific variable(s) the function will have to use either:
-1. arguments object
-2. rest syntax
+<strong>important note: </strong>since v1.1.0 function passed as expression argument no longer takes in an array, intead it'll take an object containing all the varaibles passed by the user as its propert. User can now use object destructuring to get the exact value they wish to use inside the function.
 
+This will not work in v1.1.0 and up
 ```js
 const dataObj = {
   data1: "something",
@@ -282,7 +284,10 @@ compare(dataObj)
   .Ended((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
 ```
 
-The order of the variable is in the same as the order you passed into Compare.
+Use destructuring instead
+```js
+const processData = ({ data1, data2, data3 }) => console.log(data1 + data2 + data3);
+```
 
 ### Passing callback at end of a case
 
