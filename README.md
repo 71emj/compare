@@ -4,7 +4,7 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
 
-<strong>Important update to v1.1.0</strong>, see [Passing function as expression](#passing-function-as-expression).
+<strong>Important update to v1.1.0</strong> see [Passing function as expression](#passing-function-as-expression).
 
 <strong>Friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
