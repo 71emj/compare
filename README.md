@@ -252,7 +252,7 @@ request("some url", (err, response, body) => {
 request("some url", (err, response, body) => {
   const parse = body => /* parsing body */;
   const evaluateTheDataParsed = parsed => /* return boolean */
-  const parseAndEvaluate = target => evaluateTheDataParsed( parse(target) );
+  const parseAndEvaluate = ({ body }) => evaluateTheDataParsed( parse(body) );
   compare({ body })
     .toCaseOR(parseAndEvaluate, "some value")
     .toCaseOR(parseAndEvaluate_2, "other value")
