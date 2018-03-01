@@ -127,9 +127,7 @@ class SwitchCase {
     if (this._filter(expression)) { 
       throw new Error("Expression must be single-statement-only"); 
     }
-    const functionExp = /*typeof expression === "function"
-        ? expression
-        :*/ new Function(...args, statement);
+    const functionExp = new Function(...args, statement);
     
     try { 
       return typeof expression === "function" 

@@ -46,8 +46,8 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 
 	test("single name-value pair expression, should also be able to compare OR case", () => {
 		compare({ home: "home" })
-			.toCaseOR(["halla", "hishome"], "not true")
-			.toCaseOR(["home", "skills", "about"], "true")
+			.toCase(["halla", "hishome"], "not true")
+			.toCase(["home", "skills", "about"], "true")
 			.toAllOther("nothing here")
 			.Ended((debug, result) =>	expect(result).toBe("true"));
 	});
@@ -84,11 +84,11 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 
 		compare(params)
 			.toCase(exp, "it's number")
-			.toCaseOR([exp, "city === 'Kaohsiung'"], "still not compare")
+			.toCase([exp, "city === 'Kaohsiung'"], "still not compare")
 			.toCaseAND(["home === 'Taiwan'", "city === 'New York'"], "you'd think but no")
 			.toCase((...args) => { return console.log(args) }, "just checking")
 			.toCaseAND(["home === 'Taiwan'", "city === 'Charlotte'"], "compareing AND")
-			.toCaseOR("home === 'Taiwan'", "well this is as much as I can think of")
+			.toCase("home === 'Taiwan'", "well this is as much as I can think of")
 			.toAllOther("no compare found")
 			.Ended((debug, result) => expect(result).toBe("compareing AND"));
 	});
@@ -103,7 +103,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		
 		compare(params)
 			.toCase(exp, "it's number")
-			.toCaseOR([exp, "city === 'Kaohsiung'"], "still not compare")
+			.toCase([exp, "city === 'Kaohsiung'"], "still not compare")
 			.toAllOther("no compare found")
 			.Ended((debug, result) => expect(result).toBe("it's number"));
 	});
@@ -131,7 +131,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		// the evaluation mthod will see it as true (before the promise is resolved)
 		// thus will automatically compare any async function that comes first
 		compare({ num: 10, city: "Tokyo" })
-			.toCaseOR([exp2, "city === 'Kaohsiung'"], "still not compare")
+			.toCase([exp2, "city === 'Kaohsiung'"], "still not compare")
 			.toCase(exp, "it's number")
 			.toCase("num === 10", "check if this is true")
 			.toAllOther("no compare found")

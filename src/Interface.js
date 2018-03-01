@@ -9,13 +9,10 @@ class SwitchInterface extends SwitchCase {
     return this;
   }
 
-  toCase(singleExp, values, fn) {
-    this.match(this._interpret(singleExp), values, fn, "SIMPLE");
-    return this;
-  }
-
-  toCaseOR(exprs, values, fn) {
-    this.match(this._interpret(exprs), values, fn, "OR");
+  toCase(exprs, values, fn) {
+  	Array.isArray(exprs) 
+  		? this.match(this._interpret(exprs), values, fn, "OR") 
+  		: this.match(this._interpret(exprs), values, fn, "SIMPLE")
     return this;
   }
 
@@ -72,10 +69,11 @@ class SwitchInterface extends SwitchCase {
       exprs = [exprs];
     }
     const name = this.testTargets.args[0];
-    const mapping = expression => { // mathcing "value", "operator", "followed value"
+    const mapping = expression => { 
       const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
       return simple ? `${name} ${simple[2] || "==="} "${simple[1] || simple[3]}"` : expression;
-    };
+    }; // mathcing in sequence of "value", "operator", "following value"
+    
     return exprs.map(mapping);
   }
 }
