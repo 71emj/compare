@@ -37,8 +37,8 @@ class SwitchInterface extends SwitchCase {
   _interpret(exprs) {
     if (this._screen(exprs)) {
       throw new Error(
-        `individual expression must not exceed more than ${rules.limit} characters ` +
-        `and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
+        `individual expression must not exceed more than ${this.rules.limit} characters ` +
+        `and must not contain keywords such as ${this.rules.keywords.join(", ")} etc.`
       );
     }
     return this.simpleExp ? this._verbose(exprs) : exprs;
@@ -71,9 +71,10 @@ class SwitchInterface extends SwitchCase {
     const name = this.testTargets.args[0];
     const mapping = expression => { 
       const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
-      return simple ? `${name} ${simple[2] || "==="} "${simple[1] || simple[3]}"` : expression;
+      return simple ? `${name} ${simple[2] || (+expression ? "==" : "===")} "${simple[1] || simple[3]}"` : expression;
     }; // mathcing in sequence of "value", "operator", "following value"
-    
+
+    console.log(exprs.map(mapping));
     return exprs.map(mapping);
   }
 }

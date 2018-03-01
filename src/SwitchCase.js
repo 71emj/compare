@@ -1,3 +1,4 @@
+
 class SwitchCase {
   get testTargets() {
     return this.targets;
@@ -67,6 +68,7 @@ class SwitchCase {
       throw new TypeError("TestTargets cannot be null or undefined");
     }
     if (!expcheck) {
+      console.log(expcheck);
       throw new TypeError("An expression must be a string, array of string, or a function");
     }
     return;

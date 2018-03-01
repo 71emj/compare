@@ -44,7 +44,18 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			});
 	});
 
-	test("single name-value pair expression, should also be able to compare OR case", () => {
+	test("simple expression, should be able to match number", () => {
+		compare({ number: 15 })
+			.toCase([10, 12, 11], "wrong")
+			.toCase("15", "correct")
+			.toAllOther("I don't think this is the case")
+			.Ended((debug, result) => {
+				debug();
+				expect(result).toBe("correct")
+			});
+	})
+
+	test("simple expression, should also be able to compare OR case", () => {
 		compare({ home: "home" })
 			.toCase(["halla", "hishome"], "not true")
 			.toCase(["home", "skills", "about"], "true")
