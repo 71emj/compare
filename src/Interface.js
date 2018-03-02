@@ -8,9 +8,9 @@ class SwitchInterface extends SwitchCase {
   }
 
   toCase(exprs, values, fn) {
-  	Array.isArray(exprs) 
-  		? this.match(this._interpret(exprs), values, fn, "OR") 
-  		: this.match(this._interpret(exprs), values, fn, "SIMPLE")
+  	Array.isArray(exprs)
+  	  ? this.match(this._interpret(exprs), values, fn, "OR")
+  	  : this.match(this._interpret(exprs), values, fn, "SIMPLE")
     return this;
   }
 

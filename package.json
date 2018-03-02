@@ -4,14 +4,11 @@
   "description": "An alternative to vanilla switch",
   "main": "index.js",
   "scripts": {
+    "predeploy": "eslint src/",
     "flow": "flow",
     "test": "jest --watchAll && flow"
   },
-  "keywords": [
-    "switch",
-    "switch-case",
-    "match-case"
-  ],
+  "keywords": ["switch", "switch-case", "match-case"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/71emj/compare.git"
@@ -29,6 +26,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
+    "eslint": "^4.18.1",
     "flow": "^0.2.3",
     "flow-bin": "^0.66.0",
     "jest": "^22.4.2",

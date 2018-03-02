@@ -1,3 +1,5 @@
+// @flow
+
 class SwitchCase {
   get testTargets() {
     return this.targets;
@@ -19,7 +21,6 @@ class SwitchCase {
 
   setTargets(...targets) {
     this._testForError("targets", targets);
-    const len = targets.length;
     const collection = { targets: {}, args: [], values: [] };
 
     const setArrToObj = (obj, item) => Object.assign(obj, item);
@@ -130,7 +131,7 @@ class SwitchCase {
         if (typeof exp === "function") { 
           return; 
         }
-        if (!!exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) { 
+        if (exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) { 
           throw new Error("Expression must be single-statement-only");
         }
       }  
