@@ -16,7 +16,7 @@ function Compare(config: { limit?: number, keywords: Array<string> }) {
 
 	function Factory(args: { }) {
 		if (!args) { 
-			throw new Error("argument cannot be empty");
+			throw new Error("Argument cannot be empty");
 		}
 		if (typeof arguments[0] !== "object") { 
 			throw new TypeError("Variable must be an object, or an array of objects"); 

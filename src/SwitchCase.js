@@ -1,4 +1,3 @@
-
 class SwitchCase {
   get testTargets() {
     return this.targets;
@@ -19,11 +18,12 @@ class SwitchCase {
   }
 
   setTargets(...targets) {
+    this._testForError("targets", targets);
     const len = targets.length;
     const collection = { targets: {}, args: [], values: [] };
 
     const setArrToObj = (obj, item) => Object.assign(obj, item);
-    const setObjToMap = (collection, elem) => { 
+    const setObjToMap = (collection, elem) => {
       collection.args.push(elem[0]);
       collection.values.push(elem[1]);
       return collection;
@@ -37,7 +37,7 @@ class SwitchCase {
   // @ param is the native interface of SwitchCase
   // will need to implement typecheck
   match(exp, values, fn, flag) {
-    this._beforeStart(exp);
+    this._testForError("expression", exp);
     if (this.isMatched) {
       return this;
     }
@@ -45,10 +45,8 @@ class SwitchCase {
     [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
 
     const expr = this._setExpression(exp);
-    const methods = { SIMPLE: "_evaluateOne" };
-
-    const matching = flag in methods 
-      ? this[methods[flag]](expr.get(0))
+    const matching = flag === "SIMPLE" 
+      ? this._evaluateOne(expr.get(0)) 
       : this._evaluateMany(expr, flag);
 
     matching && this._break(values, fn);
@@ -61,19 +59,23 @@ class SwitchCase {
     };
     return fn(debug, this.result);
   }
-  
-  _beforeStart(exp) {
-    const expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
-    if (!this.testTargets) {
-      throw new TypeError("TestTargets cannot be null or undefined");
-    }
-    if (!expcheck) {
-      console.log(expcheck);
-      throw new TypeError("An expression must be a string, array of string, or a function");
-    }
-    return;
+
+  _testForError(name, val) {
+    return {
+      targets: targets => {
+        if (!targets || typeof targets !== "object") {
+          throw new TypeError("TestTargets cannot be null or undefined");
+        }
+      },
+      expression: exp => {
+        const expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
+        if (!expcheck) {
+          throw new TypeError("An expression must be a string, array of string, or a function");
+        }
+      }
+    }[name](val);
   }
-  
+
   _break(val, fn) {
     this.isMatched = true;
     this.result = typeof fn === "function" ? fn(val) : val;
@@ -101,7 +103,7 @@ class SwitchCase {
       throw new Error("Requested task is not a valid type in this method");
     }
     for (let i = 0; i < expr.size; i++) {
-      if (boolSet[flag][0] ? this._evaluateOne(expr.get(i)) : !this._evaluateOne(expr.get(i))) { 
+      if (boolSet[flag][0] ? this._evaluateOne(expr.get(i)) : !this._evaluateOne(expr.get(i))) {
         return boolSet[flag][0];
       }
     }
@@ -119,23 +121,22 @@ class SwitchCase {
     security, that can be modify by user via json or config object      
   */
   _filter(expression) {
-    return typeof expression === "function"
-      ? false
-      : !!expression.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/);
+    return typeof expression === "function" ?
+      false :
+      !!expression.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/);
   }
 
   _matchingExpression(expression, { targets, args, values }) {
     const statement = "return " + expression;
-    if (this._filter(expression)) { 
-      throw new Error("Expression must be single-statement-only"); 
+    if (this._filter(expression)) {
+      throw new Error("Expression must be single-statement-only");
     }
     const functionExp = new Function(...args, statement);
-    try { 
-      return typeof expression === "function" 
-      ? expression(targets)
-      : functionExp(...values); 
-    } 
-    catch(err) { throw err; }
+    try {
+      return typeof expression === "function" ?
+        expression(targets) :
+        functionExp(...values);
+    } catch (err) { throw err; }
   }
 }
 
