@@ -1,5 +1,5 @@
 import Compare from "../index";
-import SwitchCase from "../dist/SwitchCase";
+import SwitchCase from "../src/SwitchCase";
 
 describe("test native SwitchCase error handling functions", () => {
   let caseSwitch;
