@@ -66,16 +66,14 @@ class SwitchCase {
     return true;
   }
 
-  _setExpression(cases) {
-    if (!Array.isArray(cases)) {
-      cases = [cases];
-    }
-    const expressions = new Map();
-    const len = cases.length;
+  _setExpression(expressions) {
+    const exprs = this._isArray(expressions);
+    const aCase = new Map();
+    const len = exprs.length;
     for (let i = 0; i < len; i++) {
-      expressions.set(i, cases[i]);
+      aCase.set(i, exprs[i]);
     }
-    return expressions;
+    return aCase;
   }
 
   _evaluateMany(expr, flag) {
@@ -108,6 +106,10 @@ class SwitchCase {
         expression(targets) :
         functionExp(...values);
     } catch (err) { throw err; }
+  }
+
+  _isArray(expr) {
+    return Array.isArray(expr) ? expr : [ expr ];
   }
 
   _testForError(name, val) {

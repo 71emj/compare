@@ -37,7 +37,8 @@ class SwitchInterface extends SwitchCase {
     return fn(debug, this.result);
   }
 
-  _interpret(exprs) {
+  _interpret(expression) {
+  	const exprs = this._isArray(expression);
     if (this._screen(exprs)) {
       throw new Error(
         `individual expression must not exceed more than ${this.rules.limit} characters ` +
@@ -48,11 +49,9 @@ class SwitchInterface extends SwitchCase {
   }
 
   _screen(exprs) {
-    if (!Array.isArray(exprs)) {
-      exprs = [exprs];
-    }
     const pattern = `${this.rules.keywords.join("|")}|.{${this.rules.limit},}`;
     const regexp = new RegExp(pattern);
+   
     for (let i = 0, len = exprs.length; i < len; i++) {
       if (typeof exprs[i] === "function") {
         continue;
@@ -67,9 +66,6 @@ class SwitchInterface extends SwitchCase {
   _verbose(exprs) {
     if (typeof exprs === "function") {
       return exprs;
-    }
-    if (!Array.isArray(exprs)) {
-      exprs = [exprs];
     }
     const name = this.testTargets.args[0];
     const mapping = expression => { 
