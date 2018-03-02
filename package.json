@@ -1,6 +1,6 @@
 {
   "name": "case-compare",
-  "version": "1.2.1",
+  "version": "1.2.2-0",
   "description": "An alternative to vanilla switch",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,11 @@
     "flow": "flow",
     "test": "jest --watchAll && flow"
   },
-  "keywords": ["switch", "switch-case", "match-case"],
+  "keywords": [
+    "switch",
+    "switch-case",
+    "match-case"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/71emj/compare.git"
