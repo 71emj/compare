@@ -16,6 +16,11 @@ class SwitchInterface extends SwitchCase {
     return this;
   }
 
+  toCaseOR(exprs, values, fn) {
+  	this.match(this._interpret(exprs), values, fn, "OR");
+  	return this;
+  }
+
   toCaseAND(exprs, values, fn) {
     this.match(this._interpret(exprs), values, fn, "AND");
     return this;
