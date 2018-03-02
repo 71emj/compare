@@ -1,3 +1,3 @@
-const Compare = require("./src/Compare");
+const Compare = require("./dist/Compare");
 
 module.exports = Compare;

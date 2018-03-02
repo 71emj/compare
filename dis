@@ -1,0 +1,337 @@
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var SwitchInterface = require("./Interface");
+
+function Compare(config) {
+	"use strict";
+	// Match should take in a config object 
+	// and return an wrapper function for minimal interface 	
+	// @ Wrapper provides interface to utilize full power of the SwitchCase
+	// such as interpreting simple expression to more verbose (accepted format of SwitchCase) expression 
+
+	var securityConfig = {
+		limit: 50,
+		keywords: ["document", "window", "process"]
+	};
+	var rules = Object.assign(securityConfig, config);
+
+	function Factory(args) {
+		var _switchCase$_init;
+
+		if (!args) {
+			throw new Error("Argument cannot be empty");
+		}
+		if (_typeof(arguments[0]) !== "object") {
+			throw new TypeError("Variable must be an object, or an array of objects");
+		}
+
+		var switchCase = new SwitchInterface();
+		var targets = Array.isArray(args) ? args : Array.from(arguments);
+		var argIsSimple = Object.keys(args).length === 1;
+		return (_switchCase$_init = switchCase._init(argIsSimple, rules)).setTargets.apply(_switchCase$_init, _toConsumableArray(targets));
+	}
+
+	return Factory;
+}
+
+module.exports = Compare;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SwitchCase = require("./SwitchCase");
+
+var SwitchInterface = function (_SwitchCase) {
+  _inherits(SwitchInterface, _SwitchCase);
+
+  function SwitchInterface() {
+    _classCallCheck(this, SwitchInterface);
+
+    return _possibleConstructorReturn(this, (SwitchInterface.__proto__ || Object.getPrototypeOf(SwitchInterface)).apply(this, arguments));
+  }
+
+  _createClass(SwitchInterface, [{
+    key: "_init",
+    value: function _init(isSimple, rules) {
+      this.rules = rules;
+      this.simpleExp = isSimple;
+      return this;
+    }
+  }, {
+    key: "toCase",
+    value: function toCase(exprs, values, fn) {
+      Array.isArray(exprs) ? this.match(this._interpret(exprs), values, fn, "OR") : this.match(this._interpret(exprs), values, fn, "SIMPLE");
+      return this;
+    }
+  }, {
+    key: "toCaseOR",
+    value: function toCaseOR(exprs, values, fn) {
+      this.match(this._interpret(exprs), values, fn, "OR");
+      return this;
+    }
+  }, {
+    key: "toCaseAND",
+    value: function toCaseAND(exprs, values, fn) {
+      this.match(this._interpret(exprs), values, fn, "AND");
+      return this;
+    }
+  }, {
+    key: "toAllOther",
+    value: function toAllOther(values, fn) {
+      this.match("true", values, fn, "SIMPLE");
+      return this;
+    }
+  }, {
+    key: "Ended",
+    value: function Ended(fn) {
+      var _this2 = this;
+
+      var debug = function debug(options) {
+        var targets = _this2.testTargets;
+        console.log(options ? targets[options] : targets);
+      };
+      return fn(debug, this.result);
+    }
+  }, {
+    key: "_interpret",
+    value: function _interpret(expression) {
+      var exprs = this._isArray(expression);
+      if (this._screen(exprs)) {
+        throw new Error("individual expression must not exceed more than " + this.rules.limit + " characters " + ("and must not contain keywords such as " + this.rules.keywords.join(", ") + " etc."));
+      }
+      return this.simpleExp ? this._verbose(exprs) : exprs;
+    }
+  }, {
+    key: "_screen",
+    value: function _screen(exprs) {
+      var pattern = this.rules.keywords.join("|") + "|.{" + this.rules.limit + ",}";
+      var regexp = new RegExp(pattern);
+
+      for (var i = 0, len = exprs.length; i < len; i++) {
+        if (typeof exprs[i] === "function") {
+          continue;
+        }
+        if (regexp.test(exprs[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }, {
+    key: "_verbose",
+    value: function _verbose(exprs) {
+      if (typeof exprs === "function") {
+        return exprs;
+      }
+      var name = this.testTargets.args[0];
+      var mapping = function mapping(expression) {
+        var simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
+        return simple ? name + " " + (simple[2] || (+expression ? "==" : "===")) + " \"" + (simple[1] || simple[3]) + "\"" : expression;
+      }; // mathcing in sequence of "value", "operator", "following value"
+      return exprs.map(mapping);
+    }
+  }]);
+
+  return SwitchInterface;
+}(SwitchCase);
+
+module.exports = SwitchInterface;
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var SwitchCase = function () {
+  function SwitchCase() {
+    _classCallCheck(this, SwitchCase);
+  }
+
+  _createClass(SwitchCase, [{
+    key: "setTargets",
+    value: function setTargets() {
+      for (var _len = arguments.length, targets = Array(_len), _key = 0; _key < _len; _key++) {
+        targets[_key] = arguments[_key];
+      }
+
+      this._testForError("targets", targets);
+      var collection = { targets: {}, args: [], values: [] };
+
+      var setArrToObj = function setArrToObj(obj, item) {
+        return Object.assign(obj, item);
+      };
+      var setObjToMap = function setObjToMap(collection, elem) {
+        collection.args.push(elem[0]);
+        collection.values.push(elem[1]);
+        return collection;
+      };
+
+      collection.targets = targets.reduce(setArrToObj, {});
+      this.testTargets = Object.entries(collection.targets).reduce(setObjToMap, collection);
+      return this;
+    }
+
+    // @ param is the native interface of SwitchCase
+    // will need to implement typecheck
+
+  }, {
+    key: "match",
+    value: function match(exp, values, fn, flag) {
+      this._testForError("expression", exp);
+      if (this.isMatched) {
+        return this;
+      }
+
+      var _ref = arguments.length <= 3 ? [fn, null] : [flag, fn];
+
+      var _ref2 = _slicedToArray(_ref, 2);
+
+      flag = _ref2[0];
+      fn = _ref2[1];
+
+      var _ref3 = typeof values === "function" ? [null, values] : [values, fn];
+
+      var _ref4 = _slicedToArray(_ref3, 2);
+
+      values = _ref4[0];
+      fn = _ref4[1];
+
+
+      var expr = this._setExpression(exp);
+      var matching = flag === "SIMPLE" ? this._evaluateOne(expr.get(0)) : this._evaluateMany(expr, flag);
+
+      matching && this._break(values, fn);
+      return this;
+    }
+  }, {
+    key: "end",
+    value: function end(fn) {
+      var _this = this;
+
+      var debug = function debug() {
+        console.log(_this.testTargets);
+      };
+      return fn(debug, this.result);
+    }
+  }, {
+    key: "_break",
+    value: function _break(val, fn) {
+      this.isMatched = true;
+      this.result = typeof fn === "function" ? fn(val) : val;
+      return true;
+    }
+  }, {
+    key: "_setExpression",
+    value: function _setExpression(expressions) {
+      var exprs = this._isArray(expressions);
+      var aCase = new Map();
+      var len = exprs.length;
+      for (var i = 0; i < len; i++) {
+        aCase.set(i, exprs[i]);
+      }
+      return aCase;
+    }
+  }, {
+    key: "_evaluateMany",
+    value: function _evaluateMany(expr, flag) {
+      var boolSet = {
+        "OR": [true, false],
+        "AND": [false, true]
+      };
+      if (!(flag in boolSet)) {
+        throw new Error("Requested task is not a valid type in this method");
+      }
+      for (var i = 0; i < expr.size; i++) {
+        if (boolSet[flag][0] ? this._evaluateOne(expr.get(i)) : !this._evaluateOne(expr.get(i))) {
+          return boolSet[flag][0];
+        }
+      }
+      return boolSet[flag][1];
+    }
+  }, {
+    key: "_evaluateOne",
+    value: function _evaluateOne(expression) {
+      var testTargets = this.testTargets;
+      return this._matchingExpression(expression, testTargets);
+    }
+  }, {
+    key: "_matchingExpression",
+    value: function _matchingExpression(expression, _ref5) {
+      var targets = _ref5.targets,
+          args = _ref5.args,
+          values = _ref5.values;
+
+      this._testForError("filter", expression);
+      var statement = "return " + expression;
+      var functionExp = new (Function.prototype.bind.apply(Function, [null].concat(_toConsumableArray(args), [statement])))();
+      try {
+        return typeof expression === "function" ? expression(targets) : functionExp.apply(undefined, _toConsumableArray(values));
+      } catch (err) {
+        throw err;
+      }
+    }
+  }, {
+    key: "_isArray",
+    value: function _isArray(expr) {
+      return Array.isArray(expr) ? expr : [expr];
+    }
+  }, {
+    key: "_testForError",
+    value: function _testForError(name, val) {
+      return {
+        targets: function targets(_targets) {
+          // because of rest syntax targets is always going to be an array
+          if (!_targets || _typeof(_targets[0]) !== "object") {
+            throw new TypeError("TestTargets cannot be null or undefined");
+          }
+        },
+        expression: function expression(exp) {
+          var expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
+          if (!expcheck) {
+            throw new TypeError("An expression must be a string, array of string, or a function");
+          }
+        },
+        filter: function filter(exp) {
+          if (typeof exp === "function") {
+            return;
+          }
+          if (exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
+            throw new Error("Expression must be single-statement-only");
+          }
+        }
+      }[name](val);
+    }
+  }, {
+    key: "testTargets",
+    get: function get() {
+      return this.targets;
+    },
+    set: function set(targetObj) {
+      this.targets = targetObj;
+      this.isMatched = false;
+      this.result = null;
+    }
+  }, {
+    key: "isMatched",
+    get: function get() {
+      return this.matched;
+    },
+    set: function set(bool) {
+      this.matched = bool;
+    }
+  }]);
+
+  return SwitchCase;
+}();
+
+module.exports = SwitchCase;
