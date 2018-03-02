@@ -1,8 +1,8 @@
 {
-	"presets": [["env", { "modules": false }], "react"],
+	"presets": [["env", { "modules": false }]],
 	"env": {
 		"test": {
-			"presets": [["env"], "react", "flow"]
+			"presets": [["env"], "flow"]
 		}
 	},
 	"plugins": ["transform-flow-strip-types"]
