@@ -59,7 +59,7 @@ describe("test Compare error handling functions", () => {
 
     expect(() => {
       compare(name).toCase("myhome", "not true").Ended((debug, result) => debug())
-    }).toThrow("Variable must be an object, or an array of objects");
+    }).toThrowError("Variable must be an object, or an array of objects");
   });
 
   test("using simple expression while passing multiple more than one argument should throw Reference Error", () => {

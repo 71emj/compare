@@ -1,8 +1,6 @@
 const SwitchCase = require("./SwitchCase");
 
 class SwitchInterface extends SwitchCase {
-  // interfaces can be extracted from object, and defined as 
-  // wrapper methods
   _init(isSimple, rules) {
     this.rules = rules;
     this.simpleExp = isSimple;
