@@ -35,6 +35,12 @@ describe("test native SwitchCase error handling functions", () => {
       )
     }).toThrowError("Expression must be single-statement-only");
   });
+
+  test("passing insufficient argument to match, minimum of three, will throw task invalid error", () => {
+		expect(() => {
+			caseSwitch.setTargets({ name: "71emj" }).match("name === '71emj'", "cool")
+		}).toThrowError("Requested task is not a valid type in this method");
+  });
 });
 
 describe("test Compare error handling functions", () => {
@@ -66,6 +72,19 @@ describe("test Compare error handling functions", () => {
     expect(() => {
       compare({ name: "hello", city: "Charlotte" }).toCase(["Charlotte", "hello"], "invalid")
     }).toThrowError(ReferenceError);
+		
+
+		// expect(() => {
+			for (let i = 1; i <= 100; ++i) {
+				compare({ i })
+			  	.toCaseAND(["!(i % 5)", "!(i % 3)"], "FizzBuzz")
+			  	.toCase("!(i % 3)", "Fizz")
+			  	.toCase("!(i % 5)", "Buzz")
+			  	.Ended((debug, result) => console.log(result || i));
+			}
+		// }).toThrowError(Error);
+		
+		
   });
 });
 

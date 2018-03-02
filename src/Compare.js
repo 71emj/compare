@@ -1,8 +1,6 @@
-// @flow
-
 const SwitchInterface = require("./Interface");
 
-function Compare(config: { limit?: number, keywords: Array<string> }) {
+function Compare(config) {
 	"use strict";
 	// Match should take in a config object 
 	// and return an wrapper function for minimal interface 	
@@ -14,7 +12,7 @@ function Compare(config: { limit?: number, keywords: Array<string> }) {
 	};
 	const rules = Object.assign(securityConfig, config);
 
-	function Factory(args: { }) {
+	function Factory(args) {
 		if (!args) { 
 			throw new Error("Argument cannot be empty");
 		}
