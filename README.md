@@ -225,7 +225,6 @@ const newArray = array.filter(filtering);
 Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format. Passing function to as evaluation strategy can be a good way to do it:
 
 ```js
-
 // in normal situation you would do this
 request("some url", (err, response, body) => {
   const step1 = /* do something with body */
