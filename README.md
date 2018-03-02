@@ -4,11 +4,8 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases. 
 
-<strong>patch note 1.2.6</strong> 
-* Implemented error handling to check for common mistakes.
-* Combined [toCase](#comparetocaseexpression-value-callback) with [toCaseOR](#comparetocaseorexpressions-value-callback) (toCaseOR is still supported), however user can simply use toCase in most scenario.
-
-<strong>important note on version 1.2.0 - 1.2.4</strong>: first time setting up flow causes a huge amount of unfortunate bugs and syntax errors, if you are currently using Compare with version name ranging between 1.2.0 - 1.2.4 please update to the latest (1.2.5 and up).
+<strong>patch note 1.2.9</strong> 
+* bug fix on evaluation error when passing function (Unexpected error }...)
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
