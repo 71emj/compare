@@ -1,4 +1,4 @@
-import SwitchCase from "../src/SwitchCase";
+import SwitchCase from "../dist/SwitchCase";
 
 describe("test native methods of SwitchCase", () => {
   let caseSwitch;

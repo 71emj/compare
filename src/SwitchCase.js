@@ -1,5 +1,3 @@
-// @flow
-
 class SwitchCase {
   get testTargets() {
     return this.targets;
@@ -101,7 +99,7 @@ class SwitchCase {
   _matchingExpression(expression, { targets, args, values }) {
     this._testForError("filter", expression);
     const statement = "return " + expression;
-    const functionExp = new Function(...args, statement);
+    const functionExp = Function(...args, statement);
     try {
       return typeof expression === "function" ?
         expression(targets) :

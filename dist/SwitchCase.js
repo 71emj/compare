@@ -129,7 +129,7 @@ var SwitchCase = function () {
 
       this._testForError("filter", expression);
       var statement = "return " + expression;
-      var functionExp = new (Function.prototype.bind.apply(Function, [null].concat(_toConsumableArray(args), [statement])))();
+      var functionExp = Function.apply(undefined, _toConsumableArray(args).concat([statement]));
       try {
         return typeof expression === "function" ? expression(targets) : functionExp.apply(undefined, _toConsumableArray(values));
       } catch (err) {
