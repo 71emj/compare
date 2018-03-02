@@ -2,11 +2,13 @@
 
 [![npm version](https://badge.fury.io/js/case-compare.svg)](https://badge.fury.io/js/case-compare)
 
-Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string(s), array, and function as "case(s)" as well as end-of-evaluation callback and individual case callbacks(optional). 
+Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases. 
 
-<strong>Important update to v1.1.0</strong> see [Passing function as expression](#passing-function-as-expression).
+<strong>patch note 1.2.0:</strong> 
+* Implemented error handling to check for common mistakes.
+* Combined [toCase](#comparetocaseexpression-value-callback) with [toCaseOR](#comparetocaseorexpressions-value-callback) (toCaseOR is still supported), however user can simply use toCase in most scenario.
 
-<strong>Friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
+<strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
 ## Installation
 Installation can be done via npm
@@ -69,7 +71,7 @@ compare({ name: "home" })
   .toAllOther("nothing matched")
   .Ended((debug, result) => console.log(result)); // "just home"
 ``` 
-With Compare you can simply pass whatever variable(s) you wish to evaluate in the form of an object property (or if needed an array of objects). The variable (now a property of an object) will be evaluated against every expression(s) stated in each case, and once a match is found Compare will deliver the value (the second argument) associated with the case back to you.
+With Compare you can simply pass whatever variable(s) you wish to evaluate in the form of an object property (or if needed an array of objects). The variable (now a property of an object) will be evaluated against every expression(s) stated in each case, and once a match is found Compare will deliver the value associated with the case back to you.
 
 ## Features
 * Basic name-value matching similar to switch.
@@ -94,6 +96,7 @@ Following contents are a list of methods for utilizing Compare
 ### Compare.toCase(expression[, value[, callback]])
 toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see [toCaseOR](#comparetocaseorexpressions-value-callback), [toCaseAND](#comparetocaseandexpressions-value-callback) for multiple expression evaluation).
 
+<strong>note: </strong>since v1.2.0 toCase will dynamically adjust it's function base on the argument type, passing an array will have the method calls for evaluation on multiple expressions (toCaseOR).
 ```js
 // this is valid
 compare({ name: "home" })
@@ -106,18 +109,6 @@ compare({ name: "home" })
   .toCase([ "home" ], "just home")
   .toAllOther("nothing matched")
   .Ended((debug, result) => console.log(result)); // "just home"
-
-// this will also work, but only the first expression in the array is evaluated
-compare({ name: "home" })
-  .toCase([ "home", "name === 'home'" ], "just home")
-  .toAllOther("nothing matched")
-  .Ended((debug, result) => console.log(result)); // "just home"
-
-// this will fail
-compare({ name: "home" })
-  .toCase([ "myhome", "home" ], "just home")
-  .toAllOther("nothing matched")
-  .Ended((debug, result) => console.log(result)); // "nothing matched"
 ```
 
 ### Compare.toCaseOR(expressions[, value[, callback]])
@@ -231,7 +222,7 @@ const newArray = array.filter(filtering);
 
 ### Passing function as expression
 
-Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format.
+Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format. Passing function to as evaluation strategy can be a good way to do it:
 
 ```js
 
@@ -241,6 +232,7 @@ request("some url", (err, response, body) => {
   const step2 = /* do somethingelse with step1 */
   ....
   const usableData = stepN;
+  
   compare({ usableData })
     .toCaseOR([ "case1", "case2", "case3" ], "some value")
     .toCaseOR([ "case4", "case5" ], "other value")
@@ -253,6 +245,7 @@ request("some url", (err, response, body) => {
   const parse = body => /* parsing body */;
   const evaluateTheDataParsed = parsed => /* return boolean */
   const parseAndEvaluate = ({ body }) => evaluateTheDataParsed( parse(body) );
+  
   compare({ body })
     .toCaseOR(parseAndEvaluate, "some value")
     .toCaseOR(parseAndEvaluate_2, "other value")
@@ -260,12 +253,11 @@ request("some url", (err, response, body) => {
     .Ended((debug, reult) => console.log("much better")) // much better
 });
 ```
+In the above example user can create a function that parse the data received from an API and perform an evaluation base on it's usage. This way you can modularize your code easily without wasting your time writing repetitive code whenever you need to iterate.
 
-If you wish to use Compare on unknown source this is a preferable pattern, as it gives you more room for security measure.
+<strong>note: </strong> for security reason it is important to note that using a custom function to evaluate data received from unknown source is a much safer pattern, you should not rely on the native security features to guard your application.
 
-<strong>important note: </strong>since v1.1.0 function passed as expression argument no longer takes in an array, intead it'll take an object containing all the varaibles passed by the user as its propert. User can now use object destructuring to get the exact value they wish to use inside the function.
-
-This will not work in v1.1.0 and up
+Custom callbaeck will receive an object containing all the variables you passed for evaluation. Using object destructuring user can easily target the variable they wish to use inside the function.
 ```js
 const dataObj = {
   data1: "something",
@@ -273,8 +265,7 @@ const dataObj = {
   data3: "somethingelse"
 };
 
-const processData = (...data) => {
-  const [ data1, data2, data3 ] = data;
+const processData = ({ data1, data2, data3 }) => {
   return console.log({ data1, data2, data3 });
 };
 
@@ -284,14 +275,9 @@ compare(dataObj)
   .Ended((debug, result) => console.log(result)) // { data1, data2, data3 }; "something"
 ```
 
-Use destructuring instead
-```js
-const processData = ({ data1, data2, data3 }) => console.log(data1 + data2 + data3);
-```
-
 ### Passing callback at end of a case
 
-Callback can be passed as second argument (replacing value) to all of the matching methods including toAllOther. Normally this is not neccessary, as it creates repitition that we all want to avoid...badly. But in scenarios where individual cases require specific action to be done, ex. making Ajax call, setting unique action at specific case becomes valuable. 
+Callback can be passed as second argument (or third argument if value have been given) to matching methods. Generally you would want to avoid doing this, as it creates repitition. However in situation where individual cases require specific action to be done, ex. making an Ajax call, setting unique action at specific case becomes valuable. 
 
 ```js
 const query = location.search().substring(1).match(/(\w+)=(\w+)/);
@@ -304,17 +290,10 @@ compare({ type: query[1], value: query[2] })
     return getVal;
   })
   .toAllOther("nothing matched")
-  .Ended((debug, result) => console.log(result)); // we'll receive matched value as usual
+  .Ended((debug, result) => console.log(result)); // if matched, getVal
 ```
 
-As shown in the example above, callback perform a specific action to fetch data unknown to the author and pass it back which can then be used in the same code block. <br/>
-<br/>
-note the argument, val, passed in the callback is in fact the value stated as second argument if provided.
-```js 
-.toCase("case", "hello world", val => {
-  console.log(val);
-}) // "hello world"
-```
+As shown in the example above, callback perform a specific action to fetch data from a remote API when case3 is matched. Returning the value in the callback will save it as result, which can later received by Ended.
 
 ### Security
 
@@ -324,12 +303,12 @@ The core functionality of Compare is to evaluate "expression string(s)", doing s
 
 There are however a few security measures implemented into Compare.
 
-* Each expression is limited to a single "statement" (so one-semi-column-only)
-* An open-close parenthesis in any part of the string are not allowed
-* Keywords such as "window", "document", "process" etc. (list can go on) are not allowed
-* Each expression has limited length default to 50 characters (the idea is, if it's too long better split it up, also prevent endless chaining)
+* Each expression is limited to a single "statement".
+* Function-like expression, object are not allowed in a string expression.
+* Keywords such as "window", "document", "process" etc. (list can go on) are not allowed in a string expression.
+* Each expression has limited length default to 50 characters.
 
-Custom rules regarding keywords and word length screening can be passed as config object when importing Compare into your project.
+Custom rules regarding keywords and word length screening can be passed as a config object when importing Compare into your project.
 ```js
 const Compare = require("case-compare");
 const rules = { limit: 50, keywords: ["document", "window", "process"] }; // the value here are set in default, you can custom the rules to your preference
@@ -341,7 +320,7 @@ compare({ win })
   .toAllOther("wrong")
   .Ended((debug, result) => console.log(result)) // Error: individual expression must not...
 ```
-Since the expression contains keyword "window", the screening process will deemed invalid and throw an Error. In scenario where you want to match the literal word "window", a safe way to do it without compromising security is to pass a function or a "simple expression".
+Since the expression contains keyword "window", the screening process will deemed invalid and throw an Error. In scenario where you wish to match the literal word "window", a safe way to do is to pass a custom function to perform evaluation or as "simple expression".
 ```js
 const rules = { keywords: ["document", "process"] };
 const compare = new Compare(rules);
@@ -356,4 +335,4 @@ compare({ win })
 ```
 
 ## License
-MIT
+(MIT)
