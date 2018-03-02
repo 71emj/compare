@@ -74,13 +74,13 @@ describe("test Compare error handling functions", () => {
     }).toThrowError(ReferenceError);
 		
 
-		for (let i = 1; i <= 100; ++i) {
-		  compare({ i })
-		    .toCaseAND(["!(i % 5)", "!(i % 3)"], "FizzBuzz")
-		    .toCase("!(i % 3)", "Fizz")
-		    .toCase("!(i % 5)", "Buzz")
-		    .Ended((debug, result) => console.log(result || i));
-		}
+		// for (let i = 1; i <= 100; ++i) {
+		//   compare({ i })
+		//     .toCaseAND(["!(i % 5)", "!(i % 3)"], "FizzBuzz")
+		//     .toCase("!(i % 3)", "Fizz")
+		//     .toCase("!(i % 5)", "Buzz")
+		//     .Ended((debug, result) => console.log(result || i));
+		// }
 		
   });
 });
