@@ -63,29 +63,6 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.Ended((debug, result) =>	expect(result).toBe("true"));
 	});
 
-	test("forgot to pass variable or variable in wrong format should throw error", () => {
-		const name = "home";
-		
-		expect(
-			compare()
-				.toCase("myhome", "not true")
-				.Ended((debug, result) => debug())
-		).toThrowError("argument cannot be empty");
-
-		expect(
-			compare(name)
-				.toCase("myhome", "not true")
-				.Ended((debug, result) => debug())
-		).toThrow("Variable must be an object, or an array of objects");
-
-		const compareer = expect(()=>{
-  		throw new Error('1234');
-		});
-		
-		compareer.toThrow(Error);
-		compareer.toThrow('1234');
-	});
-
 	test("mix expression types: simple, verbose, array, function, in a single chain is supported", () => {
 		const exp = ({ home, city }) => +home;
 		const params = {

@@ -5,7 +5,7 @@ class SwitchInterface extends SwitchCase {
   // wrapper methods
   _init(isSimple, rules) {
     this.rules = rules;
-    this.simpleExp = true;
+    this.simpleExp = isSimple;
     return this;
   }
 
@@ -78,8 +78,6 @@ class SwitchInterface extends SwitchCase {
       const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
       return simple ? `${name} ${simple[2] || (+expression ? "==" : "===")} "${simple[1] || simple[3]}"` : expression;
     }; // mathcing in sequence of "value", "operator", "following value"
-
-    console.log(exprs.map(mapping));
     return exprs.map(mapping);
   }
 }

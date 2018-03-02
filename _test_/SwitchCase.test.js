@@ -22,14 +22,6 @@ describe("test native methods of SwitchCase", () => {
 			.end((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
-  test("if setTargets takes in null or types other than object literal, should throw error", () => {
-    caseSwitch
-      .setTargets()
-      .match([`name === "skills"`], "It's skills", "SIMPLE")
-      .match([`name === "home"`], "It's home", "SIMPLE")
-			.end((debug, vals) => expect(vals).toBe(null));
-  });
-
   test("if input name is the same as the literal condition name, if value matched should return true", () => {
     caseSwitch
       .setTargets({ home: "home" })
@@ -105,35 +97,11 @@ describe("test native methods of SwitchCase", () => {
 
     caseSwitch
       .setTargets({ name })
-      .match(exp, "It's home", result => {
-        return "It's my home";
-      }, "SIMPLE")
+      .match(exp, "It's home", result => "It's my home", "SIMPLE")
       .match("true", "It's something else", "SIMPLE")
       .end((debug, result) => {
         debug();
         expect(result).toBe("It's my home")
       });
-  });
-
-  test("each expression can only be single statement", () => {
-    const name = "home";
-
-    expect(
-      caseSwitch
-        .setTargets({ name })
-        .match(`() => { name = document.createElement("i"); name.onblur = "something" }`, "something cool", "SIMPLE")
-        .match("true", "It's something else", "SIMPLE")
-        .end((debug, result) => console.log(result))
-    ).toThrowError("Expression must be single-statement-only");
-  });
-
-  test("passing the wrong type of expression, or not passing at all will receive error", () => {
-    expect(
-      caseSwitch
-        .setTargets({ name })
-        .match(null, "something cool", "SIMPLE")
-        .match("true", "It's something else", "SIMPLE")
-        .end((debug, result) => console.log(result))
-    ).toThrowError("An expression must be a string, array of string, or a function");
   });
 });

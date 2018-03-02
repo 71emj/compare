@@ -130,7 +130,6 @@ class SwitchCase {
       throw new Error("Expression must be single-statement-only"); 
     }
     const functionExp = new Function(...args, statement);
-    
     try { 
       return typeof expression === "function" 
       ? expression(targets)
