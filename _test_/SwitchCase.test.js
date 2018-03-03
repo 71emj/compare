@@ -30,6 +30,12 @@ describe("test native methods of SwitchCase", () => {
 			.end((debug, vals) => expect(vals).toBe("It's home"));
   });
 
+  test("_setExpression should take in a string, array, and function and return a Map", () => {
+    expect(
+      caseSwitch._setExpression(["hello", "world", "expression", "doesn't", "matter"])
+    ).toBeInstanceOf(Map);
+  });
+
   test("expression w/ multiple variables and conditions can still be evaluated", () => {
     const params = {
       winScrollY: 100,
@@ -104,4 +110,26 @@ describe("test native methods of SwitchCase", () => {
         expect(result).toBe("It's my home")
       });
   });
+  
+  test("_evaluatOne and _evaluateMany can be simply one expression, _evaluate", () => {
+    const expressions = ["name === 'hello'", "name === 'world'", "name === 'expression'"];
+    expect(
+      caseSwitch.setTargets({ name: "hello" })._evaluate(
+        caseSwitch._setExpression(expressions), "SIMPLE"
+      )
+    ).toBe(true);
+
+    expect(
+      caseSwitch.setTargets({ name: "expression" })._evaluate(
+        caseSwitch._setExpression(expressions), "OR"
+      )
+    ).toBe(true);
+
+    expect(
+      caseSwitch.setTargets({ name: "expression" })._evaluate(
+        caseSwitch._setExpression(expressions), "AND"
+      )
+    ).toBe(false);
+  });
+  
 });

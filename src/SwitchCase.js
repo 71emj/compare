@@ -45,7 +45,6 @@ class SwitchCase {
     return this;
   }
 
-
   match(exp, values, fn, flag) {
     this._testForError("expression", exp);
     if (this.isMatched) {
@@ -55,11 +54,7 @@ class SwitchCase {
     [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
 
     const expr = this._setExpression(exp);
-    const matching = flag === "SIMPLE" 
-      ? this._evaluateOne(expr.get(0)) 
-      : this._evaluateMany(expr, flag);
-
-    matching && this._break(values, fn);
+    this._evaluate(expr, flag) && this._break(values, fn);
     return this;
   }
 
@@ -77,34 +72,31 @@ class SwitchCase {
   }
 
   _setExpression(expressions) {
-    const exprs = this._isArray(expressions);
-    const aCase = new Map();
-    const len = exprs.length;
-    for (let i = 0; i < len; i++) {
-      aCase.set(i, exprs[i]);
-    }
-    return aCase;
+    const setExprToMap = (map, exp, index) => map.set(index, exp);
+    return this._isArray(expressions).reduce(setExprToMap, new Map());
   }
 
-  _evaluateMany(expr, flag) {
-    const boolSet = {
-      "OR": [true, false],
-      "AND": [false, true]
-    };
-    if (!(flag in boolSet)) {
-      throw new Error("Requested task is not a valid type in this method");
-    }
-    for (let i = 0; i < expr.size; i++) {
-      if (boolSet[flag][0] ? this._evaluateOne(expr.get(i)) : !this._evaluateOne(expr.get(i))) {
-        return boolSet[flag][0];
+  _evaluate(expr, flag) {
+    this._testForError("falseFlag", flag);
+    return {
+      SIMPLE: (exp, targets) => this._matchingExpression(exp.get(0), targets),
+      OR: (exprs, targets) => {
+        for (let exp of exprs) {
+          if (this._matchingExpression(exp[1], targets)) {
+            return true;
+          }
+        }
+        return false;
+      },
+      AND: (exprs, targets) => {
+        for (let exp of exprs) {
+          if (!this._matchingExpression(exp[1], targets)) {
+            return false;
+          }
+        }
+        return true;
       }
-    }
-    return boolSet[flag][1];
-  }
-
-  _evaluateOne(expression) {
-    const testTargets = this.testTargets;
-    return this._matchingExpression(expression, testTargets);
+    }[flag](expr, this.testTargets);
   }
 
   _matchingExpression(expression, { targets, args, values }) {
@@ -131,6 +123,11 @@ class SwitchCase {
         const expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
         if (!expcheck) {
           throw new TypeError("An expression must be a string, array of string, or a function");
+        }
+      },
+      falseFlag: flag => {
+        if (!(flag === "SIMPLE" || flag === "OR" || flag === "AND")) {
+          throw new Error("Requested task is not a valid type in this method");
         }
       },
       filter: exp => {

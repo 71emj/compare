@@ -160,7 +160,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.Ended((debug, result) => debug("targets"));
   });
 
-  test("with rest syntax custom function should be able to use any variables", () => {
+  test("with object destructuring custom function should be able to use any variables", () => {
 		const exp = ({ name, gender }) => { 
 			console.log({ name, gender });
 		}
