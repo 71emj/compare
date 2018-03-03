@@ -1,3 +1,5 @@
+// @flow
+
 const SwitchCase = require("./SwitchCase");
 
 class SwitchInterface extends SwitchCase {

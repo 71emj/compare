@@ -1,3 +1,15 @@
+// @flow
+
+/** Class SwitchCase handles underlying functions
+* Compare.setTargets(...targets)
+* @param {[objects]} ...targets - bundle indefinite amount of objects into array  
+*
+* Compare.match(exp, values, fn, flag)
+* @param {string || array || function} exp - matching expression
+* @param {any} values - the data user wish to receive on matched case
+* @param {function} fn - an optionale callback
+* @param {string} flag - which type of matching user wish to perform
+*/
 class SwitchCase {
   get testTargets() {
     return this.targets;
@@ -16,7 +28,7 @@ class SwitchCase {
     this.isMatched = false;
     this.result = null;
   }
-
+  
   setTargets(...targets) {
     this._testForError("targets", targets);
     const collection = { targets: {}, args: [], values: [] };
@@ -33,8 +45,7 @@ class SwitchCase {
     return this;
   }
 
-  // @ param is the native interface of SwitchCase
-  // will need to implement typecheck
+
   match(exp, values, fn, flag) {
     this._testForError("expression", exp);
     if (this.isMatched) {

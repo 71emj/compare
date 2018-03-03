@@ -235,7 +235,7 @@ request("some url", (err, response, body) => {
     .toCaseOR([ "case1", "case2", "case3" ], "some value")
     .toCaseOR([ "case4", "case5" ], "other value")
     .toAllOther("default value")
-    .Ended((debug, reult) => console.log("what a long journey to get here")) // "what a long journey to get here"
+    .Ended((debug, result) => console.log("what a long journey to get here")) // "what a long journey to get here"
 });
 
 // however passing function, can make this process nice again
@@ -248,7 +248,7 @@ request("some url", (err, response, body) => {
     .toCaseOR(parseAndEvaluate, "some value")
     .toCaseOR(parseAndEvaluate_2, "other value")
     .toAllOther("default value")
-    .Ended((debug, reult) => console.log("much better")) // much better
+    .Ended((debug, result) => console.log("much better")) // much better
 });
 ```
 In the above example user can create a function that parse the data received from an API and perform an evaluation base on it's usage. This way you can modularize your code easily without wasting your time writing repetitive code whenever you need to iterate.

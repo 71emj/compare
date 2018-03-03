@@ -74,5 +74,3 @@ describe("test Compare error handling functions", () => {
     }).toThrowError(ReferenceError);
   });
 });
-
-
