@@ -1,5 +1,4 @@
 //      
-
 const SwitchCase = require("./SwitchCase");
 
 class SwitchInterface extends SwitchCase {
@@ -10,7 +9,7 @@ class SwitchInterface extends SwitchCase {
   }
 
   toCase(exprs, values, fn) {
-  	Array.isArray(exprs)
+  	this._type(exprs, "array")
   	  ? this.match(this._interpret(exprs), values, fn, "OR")
   	  : this.match(this._interpret(exprs), values, fn, "SIMPLE")
     return this;
@@ -33,8 +32,8 @@ class SwitchInterface extends SwitchCase {
 
   Ended(fn) {
     const debug = options => {
-      const targets = this.testTargets;
-      console.log(options ? targets[options] : targets);
+      const targets = options ? this.testTargets[options] : this.testTargets
+      console.log({ targets, cases: this.record});
     }
     return fn(debug, this.result);
   }
@@ -53,9 +52,9 @@ class SwitchInterface extends SwitchCase {
   _screen(exprs) {
     const pattern = `${this.rules.keywords.join("|")}|.{${this.rules.limit},}`;
     const regexp = new RegExp(pattern);
-   
+
     for (let i = 0, len = exprs.length; i < len; i++) {
-      if (typeof exprs[i] === "function") {
+      if (this._type(exprs[i], "function")) {
         continue;
       }
       if (regexp.test(exprs[i])) {
@@ -66,11 +65,12 @@ class SwitchInterface extends SwitchCase {
   }
 
   _verbose(exprs) {
-    if (typeof exprs === "function") {
+    if (this._type(exprs, "function")) {
       return exprs;
     }
+
     const name = this.testTargets.args[0];
-    const mapping = expression => { 
+    const mapping = expression => {
       const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
       return simple ? `${name} ${simple[2] || (+expression ? "==" : "===")} "${simple[1] || simple[3]}"` : expression;
     }; // mathcing in sequence of "value", "operator", "following value"
