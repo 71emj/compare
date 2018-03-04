@@ -8,38 +8,36 @@ class SwitchInterface extends SwitchCase {
     return this;
   }
 
-  toCase(exprs, values, fn) {
-  	this._type(exprs, "array")
-  	  ? this.match(this._interpret(exprs), values, fn, "OR")
-  	  : this.match(this._interpret(exprs), values, fn, "SIMPLE")
+  toCase(exprs, vals, fn) {
+  	this.match(this._interpret(exprs), vals, fn, "SIMPLE");
     return this;
   }
 
-  toCaseOR(exprs, values, fn) {
-  	this.match(this._interpret(exprs), values, fn, "OR");
+  toCaseOR(exprs, vals, fn) {
+  	this.match(this._interpret(exprs), vals, fn, "OR");
   	return this;
   }
 
-  toCaseAND(exprs, values, fn) {
-    this.match(this._interpret(exprs), values, fn, "AND");
+  toCaseAND(exprs, vals, fn) {
+    this.match(this._interpret(exprs), vals, fn, "AND");
     return this;
   }
 
-  toAllOther(values, fn) {
-    this.match("true", values, fn, "SIMPLE");
+  toAllOther(vals, fn) {
+    this.match("true", vals, fn, "SIMPLE");
     return this;
   }
 
   Ended(fn) {
-    const debug = options => {
-      const targets = options ? this.testTargets[options] : this.testTargets
-      console.log({ targets, cases: this.record});
+    const debug = opts => {
+      const targets = opts ? this.testTargets[opts] : this.testTargets
+      console.log({ targets, cases: this.history });
     }
     return fn(debug, this.result);
   }
 
-  _interpret(expression) {
-  	const exprs = this._isArray(expression);
+  _interpret(expr) {
+  	const exprs = this._isArray(expr);
     if (this._screen(exprs)) {
       throw new Error(
         `individual expression must not exceed more than ${this.rules.limit} characters ` +
@@ -70,9 +68,9 @@ class SwitchInterface extends SwitchCase {
     }
 
     const name = this.testTargets.args[0];
-    const mapping = expression => {
-      const simple = expression.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
-      return simple ? `${name} ${simple[2] || (+expression ? "==" : "===")} "${simple[1] || simple[3]}"` : expression;
+    const mapping = expr => {
+      const simple = expr.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
+      return simple ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"` : expr;
     }; // mathcing in sequence of "value", "operator", "following value"
     return exprs.map(mapping);
   }
