@@ -4,9 +4,9 @@
 * Compare.setTargets(...targets)
 * @param {[objects]} ...targets - bundle indefinite amount of objects into array
 *
-* Compare.match(exp, values, fn, flag)
-* @param {string || array || function} exp - matching expression
-* @param {any} values - the data user wish to receive on matched case
+* Compare.match(expr, vals, fn, flag)
+* @param {string || array || function} expr - matching expression
+* @param {any} vals - the data user wish to receive on matched case
 * @param {function} fn - an optionale callback
 * @param {string} flag - which type of matching user wish to perform
 */
@@ -15,29 +15,29 @@ class SwitchCase {
     return this.targets;
   }
 
-  get isMatched() {
-    return this.matched;
+  get history() {
+    return this.record;
   }
 
-  set isMatched(bool) {
-    this.matched = bool;
+  set history(value) {
+    this.record = value;
   }
 
   set testTargets(targetObj) {
     this.targets = targetObj;
-    this.record = [];
-    this.isMatched = false;
+    this.history = [];
+    this.matched = false;
     this.result = null;
   }
 
   setTargets(...targets) {
-    this._testForError("targets", targets);
-    const collection = { targets: {}, args: [], values: [] };
+    this._filter("bad targets", targets);
+    const collection = { targets: {}, args: [], vals: [] };
 
     const setArrToObj = (obj, item) => Object.assign(obj, item);
     const setObjToMap = (collection, elem) => {
       collection.args.push(elem[0]);
-      collection.values.push(elem[1]);
+      collection.vals.push(elem[1]);
       return collection;
     };
 
@@ -46,61 +46,58 @@ class SwitchCase {
     return this;
   }
 
-  match(exp, values, fn, flag) {
-    this._testForError("expression", exp);
-    if (this.isMatched) {
+  match(expr, vals, fn, flag) {
+    this._filter("bad expression", expr);
+    if (this.matched) {
       return this;
     }
     [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
-    [values, fn] = this._type(values, "function") ? [null, values] : [values, fn];
+    [vals, fn] = this._type(vals, "function") ? [null, vals] : [vals, fn];
 
-    const expr = this._setExpression(exp);
-    this._evaluate(expr, flag) && this._break(values, fn);
+    const exprs = this._setExpression(expr);
+    this._evaluate(exprs, flag) && this._break(vals, fn);
     return this;
   }
 
   end(fn) {
-    const debug = () => {
-      console.log(this.record);
-    };
+    const debug = () => console.log(this.record);
     return fn(debug, this.result);
   }
 
   _break(val, fn) {
-    this.isMatched = true;
+    this.matched = true;
     this.result = this._type(fn, "function") ? fn(val) : val;
     return true;
   }
 
-  _setExpression(expressions) {
-    const setExprToMap = (map, exp, index) => map.set(index, exp);
-    return this._isArray(expressions).reduce(setExprToMap, new Map());
+  _setExpression(exprs) {
+    const exptoMap = (map, expr, index) => map.set(index, expr);
+    return this._isArray(exprs).reduce(exptoMap, new Map());
   }
 
   _evaluate(expr, flag) {
-    this._testForError("invalid flag", flag);
-    const record = new Map();
-    const log = (exprs, targets, pass = [], fail = []) => {
-      exprs.forEach(exp => this._matchingExpression(exp, targets)
-        ? pass.push(this._type(exp, "function") ? "[Function]" : exp)
-        : fail.push(this._type(exp, "function") ? "[Function]" : exp));
-      fail.length && record.set("fail", fail.join(" | "));
-      pass.length && record.set("pass", pass.join(" | "));
-      return this.record.push(record) && record;
-    }
+    this._filter("bad flag", flag);
+    const entry = new Map();
 
+    const pushTo = (name, expr) => name.push(this._type(expr, "function") ? "[Function]" : expr);
+    const outline = (exprs, targets, pass = [], fail = []) => {
+      exprs.forEach(expr => this._matchExp(expr, targets) ? pushTo(pass, expr) : pushTo(fail, expr));
+      fail.length && entry.set("fail", fail.join(" | "));
+      pass.length && entry.set("pass", pass.join(" | "));
+      return this.history.push(entry) && entry;
+    }
     return {
-      SIMPLE: (exp, targets) => log(exp, targets).has("pass") ? true : false,
-      OR: (exprs, targets) => log(exprs, targets).has("pass") ? true : false,
-      AND: (exprs, targets) => log(exprs, targets).has("fail") ? false : true
+      SIMPLE: (expr, targets) => outline([ expr.get(0) ], targets).has("pass") ? true : false,
+      OR: (exprs, targets) => outline(exprs, targets).has("pass") ? true : false,
+      AND: (exprs, targets) => outline(exprs, targets).has("fail") ? false : true
     }[flag](expr, this.testTargets);
   }
 
-  _matchingExpression(expression, { targets, args, values }) {
-    const isFunction = this._testForError("invalid syntax", expression);
-    const statement = "return " + expression;
+  _matchExp(expr, { targets, args, vals }) {
+    const isFunction = this._filter("bad syntax", expr);
+    const statement = "return " + expr;
     try {
-      return isFunction ? expression(targets) : new Function(...args, statement)(...values);
+      return isFunction ? expr(targets) : new Function(...args, statement)(...vals);
     } catch (err) { throw err; }
   }
 
@@ -108,33 +105,33 @@ class SwitchCase {
     return this._type(expr, "array") ? expr : [ expr ];
   }
 
-  _type(exp, type) {
-    return type === "array" ? Array.isArray(exp) : typeof exp === type;
+  _type(expr, type) {
+    return type === "array" ? Array.isArray(expr) : typeof expr === type;
   }
 
-  _testForError(name, val) {
+  _filter(name, val) {
     return {
-      targets: targets => {
+      "bad targets": targets => {
         if (!targets || !this._type(targets[0], "object")) {
           throw new TypeError("TestTargets cannot be null or undefined");
         }
       },
-      expression: exp => {
-        const expcheck = this._type(exp, "string") || this._type(exp, "function") || this._type(exp, "array");
-        if (!expcheck) {
+      "bad expression": expr => {
+        const check = elem => this._type(expr, elem);
+        if (!(["string", "function", "array"].filter(check))) {
           throw new TypeError("An expression must be a string, array of string, or a function");
         }
       },
-      "invalid flag": flag => {
+      "bad flag": flag => {
         if (!(flag === "SIMPLE" || flag === "OR" || flag === "AND")) {
           throw new Error("Requested task is not a valid type in this method");
         }
       },
-      "invalid syntax": exp => {
-        if (this._type(exp, "function")) {
+      "bad syntax": expr => {
+        if (this._type(expr, "function")) {
           return true;
         }
-        if (exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
+        if (expr.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
           throw new Error("Expression must be single-statement-only");
         }
       }

@@ -46,7 +46,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 
 	test("simple expression, should be able to match number", () => {
 		compare({ number: 15 })
-			.toCase([10, 12, 11], "wrong")
+			.toCase([10, 15, 11], "wrong")
 			.toCase("15", "correct")
 			.toAllOther("I don't think this is the case")
 			.Ended((debug, result) => {
