@@ -1,7 +1,8 @@
 //      
+
 const SwitchInterface = require("./Interface");
 
-function Compare(config    ) {
+function Compare(config                                            ) {
 	"use strict";
 	// Match should take in a config object 
 	// and return an wrapper function for minimal interface 	

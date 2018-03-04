@@ -1,4 +1,4 @@
-// @flow
+//      
 
 const SwitchCase = require("./SwitchCase");
 
