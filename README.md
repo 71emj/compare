@@ -2,10 +2,10 @@
 
 [![npm version](https://badge.fury.io/js/case-compare.svg)](https://badge.fury.io/js/case-compare)
 
-Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases. 
+Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases.
 
-<strong>patch note 1.2.9</strong> 
-* bug fix on evaluation error when passing function (Unexpected error }...)
+<strong>patch note 1.3.0</strong>
+* Now debug will display pass/fail of each evaluated cases (cases before matched)
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
@@ -20,7 +20,7 @@ yarn add case-compare
 ```
 
 ## Why should I give up switch? (or if/else)
-Before we start dicussing why switch in general is a bad pattern, let's look at some example code:
+Before we start discussing why switch in general is a bad pattern, let's look at some example code:
 ```js
 const name = "home";
 
@@ -34,11 +34,11 @@ switch(name) {
   case "home":
     console.log("just home");
     break;
-  default: 
+  default:
     console.log("nothing matched");
 }; // "just home"
 ```
-To perform a simple name-value matching switch creates a giant code block filled with repetition that pretty much does the same thing; which not only does it waste your time whenever you tried to update a part of your logic, it causes the code base to have difficulty scaling and debugging as your project grows in size. 
+To perform a simple name-value matching switch creates a giant code block filled with repetition that pretty much does the same thing; which not only does it waste your time whenever you tried to update a part of your logic, it causes the code base to have difficulty scaling and debugging as your project grows in size.
 
 To solve this, an alternative would be using object literal:
 ```js
@@ -69,25 +69,25 @@ compare({ name: "home" })
   .toCase("home", "just home")
   .toAllOther("nothing matched")
   .Ended((debug, result) => console.log(result)); // "just home"
-``` 
+```
 With Compare you can simply pass whatever variable(s) you wish to evaluate in the form of an object property (or if needed an array of objects). The variable (now a property of an object) will be evaluated against every expression(s) stated in each case, and once a match is found Compare will deliver the value associated with the case back to you.
 
 ## Features
 * Basic name-value matching similar to switch.
 * Multiple case matching, supporting || and && operators.
 * Allows infinite chaining, with exception of attaching methods to end case method, see [Ended](#compareendedcallbackdebug-result).
-* Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targes.
+* Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targets.
 * Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpression-value-callback).
 
 ## List of Functions
 
 | Function | Description |
-|:--- |:--- | 
+|:--- |:--- |
 | [toCase](#comparetocaseexpression-value-callback) | toCase matches variables to expression specified as first argument of the function. |
 | [toCaseOR](#comparetocaseorexpressions-value-callback) | toCaseOR matches variables to an array of expressions and match if any of the expressions is truthful |
 | [toCaseAND](#comparetocaseandexpressions-value-callback) | toCaseAND is similar to toCaseOR, but will only match if all expressions are truthful |
 | [toAllOther](#comparetoallothervalue-callback) | toAllOther is an equivalent method to default in switch |
-| [Ended](#compareendedcallbackdebug-result) | Ended breaks out the evaulation chain and takes a callback to perform action on matched cases |
+| [Ended](#compareendedcallbackdebug-result) | Ended breaks out the evaluation chain and takes a callback to perform action on matched cases |
 
 ## APIs
 Following contents are a list of methods for utilizing Compare
@@ -177,11 +177,13 @@ compare({ home: null })
 ```
 
 ### Compare.Ended(callback(debug, result))
-Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken. 
+Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken.
 
-However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, Ended method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase* methods should be use instead).
+However, this pattern also encourages repetition as the code may be doing similar action with slight twist base on evaluation. To reduce repetition, Ended method provides an interface to only write the logic once at the end of each evaluation chain (if different action needed to be taken in different cases, the optional callback in all three toCase methods should be use instead).
 
-In addition an optional return can be used in the callback function, tranforming the evaluation chain into an expression.
+In addition an optional return can be used in the callback function, transforming the evaluation chain into an expression.
+
+<strong>1.3.0: </strong>now every cases that has been inspected will be record by Compare. User can call debug() to see how each expression is matched (pass/fail).
 
 ```js
 // basic
@@ -221,16 +223,16 @@ const newArray = array.filter(filtering);
 
 ### Passing function as expression
 
-Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unkown to you, in order to start matching data nested within you need to take several steps to parse it into workable format. Passing function to as evaluation strategy can be a good way to do it:
+Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unknown to you, in order to start matching data nested within you need to take several steps to parse it into workable format. Passing function to as evaluation strategy can be a good way to do it:
 
 ```js
 // in normal situation you would do this
 request("some url", (err, response, body) => {
   const step1 = /* do something with body */
-  const step2 = /* do somethingelse with step1 */
+  const step2 = /* do something else with step1 */
   ....
   const usableData = stepN;
-  
+
   compare({ usableData })
     .toCaseOR([ "case1", "case2", "case3" ], "some value")
     .toCaseOR([ "case4", "case5" ], "other value")
@@ -243,7 +245,7 @@ request("some url", (err, response, body) => {
   const parse = body => /* parsing body */;
   const evaluateTheDataParsed = parsed => /* return boolean */
   const parseAndEvaluate = ({ body }) => evaluateTheDataParsed( parse(body) );
-  
+
   compare({ body })
     .toCaseOR(parseAndEvaluate, "some value")
     .toCaseOR(parseAndEvaluate_2, "other value")
@@ -255,7 +257,7 @@ In the above example user can create a function that parse the data received fro
 
 <strong>note: </strong> for security reason it is important to note that using a custom function to evaluate data received from unknown source is a much safer pattern, you should not rely on the native security features to guard your application.
 
-Custom callbaeck will receive an object containing all the variables you passed for evaluation. Using object destructuring user can easily target the variable they wish to use inside the function.
+Custom callback will receive an object containing all the variables you passed for evaluation. Using object destructuring user can easily target the variable they wish to use inside the function.
 ```js
 const dataObj = {
   data1: "something",
@@ -275,7 +277,7 @@ compare(dataObj)
 
 ### Passing callback at end of a case
 
-Callback can be passed as second argument (or third argument if value have been given) to matching methods. Generally you would want to avoid doing this, as it creates repitition. However in situation where individual cases require specific action to be done, ex. making an Ajax call, setting unique action at specific case becomes valuable. 
+Callback can be passed as second argument (or third argument if value have been given) to matching methods. Generally you would want to avoid doing this, as it creates repetition. However in situation where individual cases require specific action to be done, ex. making an Ajax call, setting unique action at specific case becomes valuable.
 
 ```js
 const query = location.search().substring(1).match(/(\w+)=(\w+)/);
@@ -296,7 +298,7 @@ As shown in the example above, callback perform a specific action to fetch data 
 ### Security
 
 The core functionality of Compare is to evaluate "expression string(s)", doing so requires a custom function to run the "cases". However this is prone to injection attack, such that it is highly recommended to either:
-1. Never use it to evaluate unknown source 
+1. Never use it to evaluate unknown source
 2. Use function instead of expression string with custom filter
 
 There are however a few security measures implemented into Compare.
@@ -325,7 +327,7 @@ const compare = new Compare(rules);
 const win = "window";
 
 // when passing simple expression Compare will interpreted as literal string and escape it with quotes
-// making it safe to evaluate the expressions like this. 
+// making it safe to evaluate the expressions like this.
 compare({ win })
   .toCase("window", "correct")
   .toAllOther("wrong")

@@ -144,4 +144,16 @@ describe("test native methods of SwitchCase", () => {
         ._evaluate(caseSwitch._setExpression(expressions), "AND")
     ).toBe(false);
   });
+
+  test("new debug ", () => {
+    const name = "home";
+    caseSwitch
+      .setTargets({ name })
+      .match(`name === "skills"`, "It's skills", "SIMPLE")
+      .match(`name === "about"`, "It's about", "SIMPLE")
+      .match(`name === "home"`, "It's home", "SIMPLE")
+      .end((debug, result) => {
+        debug();
+      });
+  })
 });

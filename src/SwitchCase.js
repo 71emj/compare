@@ -25,6 +25,7 @@ class SwitchCase {
 
   set testTargets(targetObj) {
     this.targets = targetObj;
+    this.record = [];
     this.isMatched = false;
     this.result = null;
   }
@@ -51,7 +52,7 @@ class SwitchCase {
       return this;
     }
     [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
-    [values, fn] = typeof values === "function" ? [null, values] : [values, fn];
+    [values, fn] = this._type(values, "function") ? [null, values] : [values, fn];
 
     const expr = this._setExpression(exp);
     this._evaluate(expr, flag) && this._break(values, fn);
@@ -60,14 +61,14 @@ class SwitchCase {
 
   end(fn) {
     const debug = () => {
-      console.log(this.testTargets);
+      console.log(this.record);
     };
     return fn(debug, this.result);
   }
 
   _break(val, fn) {
     this.isMatched = true;
-    this.result = typeof fn === "function" ? fn(val) : val;
+    this.result = this._type(fn, "function") ? fn(val) : val;
     return true;
   }
 
@@ -77,24 +78,26 @@ class SwitchCase {
   }
 
   _evaluate(expr, flag) {
-    this._testForError("falseFlag", flag);
-    this.expLog = new Map();
-    const matchMany = (exprs, targets, pass = [], fail = []) => {
-      exprs.forEach(exp => this._matchingExpression(exp, targets) ? pass.push(exp) : fail.push(exp));
-      fail.length && this.expLog.set("fail", fail);
-      pass.length && this.expLog.set("pass", pass);
-      return this.expLog;
+    this._testForError("invalid flag", flag);
+    const record = new Map();
+    const log = (exprs, targets, pass = [], fail = []) => {
+      exprs.forEach(exp => this._matchingExpression(exp, targets)
+        ? pass.push(this._type(exp, "function") ? "[Function]" : exp)
+        : fail.push(this._type(exp, "function") ? "[Function]" : exp));
+      fail.length && record.set("fail", fail.join(" | "));
+      pass.length && record.set("pass", pass.join(" | "));
+      return this.record.push(record) && record;
     }
 
     return {
-      SIMPLE: (exp, targets) => this._matchingExpression(exp.get(0), targets),
-      OR: (exprs, targets) => matchMany(exprs, targets).has("pass") ? true : false,
-      AND: (exprs, targets) => matchMany(exprs, targets).has("fail") ? false : true
+      SIMPLE: (exp, targets) => log(exp, targets).has("pass") ? true : false,
+      OR: (exprs, targets) => log(exprs, targets).has("pass") ? true : false,
+      AND: (exprs, targets) => log(exprs, targets).has("fail") ? false : true
     }[flag](expr, this.testTargets);
   }
 
   _matchingExpression(expression, { targets, args, values }) {
-    const isFunction = this._testForError("filter", expression);
+    const isFunction = this._testForError("invalid syntax", expression);
     const statement = "return " + expression;
     try {
       return isFunction ? expression(targets) : new Function(...args, statement)(...values);
@@ -102,30 +105,33 @@ class SwitchCase {
   }
 
   _isArray(expr) {
-    return Array.isArray(expr) ? expr : [ expr ];
+    return this._type(expr, "array") ? expr : [ expr ];
+  }
+
+  _type(exp, type) {
+    return type === "array" ? Array.isArray(exp) : typeof exp === type;
   }
 
   _testForError(name, val) {
     return {
       targets: targets => {
-        // because of rest syntax targets is always going to be an array
-        if (!targets || typeof targets[0] !== "object") {
+        if (!targets || !this._type(targets[0], "object")) {
           throw new TypeError("TestTargets cannot be null or undefined");
         }
       },
       expression: exp => {
-        const expcheck = typeof exp === "string" || typeof exp === "function" || Array.isArray(exp) || false;
+        const expcheck = this._type(exp, "string") || this._type(exp, "function") || this._type(exp, "array");
         if (!expcheck) {
           throw new TypeError("An expression must be a string, array of string, or a function");
         }
       },
-      falseFlag: flag => {
+      "invalid flag": flag => {
         if (!(flag === "SIMPLE" || flag === "OR" || flag === "AND")) {
           throw new Error("Requested task is not a valid type in this method");
         }
       },
-      filter: exp => {
-        if (typeof exp === "function") {
+      "invalid syntax": exp => {
+        if (this._type(exp, "function")) {
           return true;
         }
         if (exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
