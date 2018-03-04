@@ -1,4 +1,4 @@
-import Compare from "../index";
+import Compare from "../src/Compare";
 
 describe("test Compare, a wrapper of SwitchCase", () => {
 	let compare;
@@ -88,7 +88,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			city: "Charlotte",
 			number: 10
 		};
-		
+
 		compare(params)
 			.toCase(exp, "it's number")
 			.toCase([exp, "city === 'Kaohsiung'"], "still not compare")
@@ -127,7 +127,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 	});
 
 	test("use SwitchCase along with Array methods", () => {
-		const array = [ "red", "blue", "yellow", 1, 2, "violet" ];
+		const array = [ "red", "blue", "yellow", "1", "2", "violet" ];
 		const filtering = elem => compare({ elem })
   		.toCaseAND(["!+elem", "elem.length >= 4", ({ elem }) => elem.match(/o/)], true)
   		.Ended((debug, result) => result);
@@ -139,7 +139,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 	test("simple expression should support arithmatic evaluation shorhand", () => {
     const num1 = 100;
     const num2 = 200;
-		
+
 		compare({ num1 })
 			.toCase("<= 15", false)
 			.toCase(">= 50", true)
@@ -161,7 +161,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
   });
 
   test("with object destructuring custom function should be able to use any variables", () => {
-		const exp = ({ name, gender }) => { 
+		const exp = ({ name, gender }) => {
 			console.log({ name, gender });
 		}
 

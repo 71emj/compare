@@ -12,14 +12,14 @@ describe("test native methods of SwitchCase", () => {
       .setTargets({ name: "skills" })
       .match([`name === "skills"`], "It's skills", "SIMPLE")
       .match([`name === "home"`], "It's home", "SIMPLE")
-			.end((debug, vals) => expect(vals).toBe("It's skills"));
+      .end((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
   test("setting string instead of array as condition in simple match should be valid", () => {
     caseSwitch
       .setTargets({ name: "skills" })
       .match(`name === "skills"`, "It's skills", "SIMPLE")
-			.end((debug, vals) => expect(vals).toBe("It's skills"));
+      .end((debug, vals) => expect(vals).toBe("It's skills"));
   });
 
   test("if input name is the same as the literal condition name, if value matched should return true", () => {
@@ -27,12 +27,18 @@ describe("test native methods of SwitchCase", () => {
       .setTargets({ home: "home" })
       .match([`home === "skills"`], "It's skills", "SIMPLE")
       .match([`home === "home"`], "It's home", "SIMPLE")
-			.end((debug, vals) => expect(vals).toBe("It's home"));
+      .end((debug, vals) => expect(vals).toBe("It's home"));
   });
 
   test("_setExpression should take in a string, array, and function and return a Map", () => {
     expect(
-      caseSwitch._setExpression(["hello", "world", "expression", "doesn't", "matter"])
+      caseSwitch._setExpression([
+        "hello",
+        "world",
+        "expression",
+        "doesn't",
+        "matter"
+      ])
     ).toBeInstanceOf(Map);
   });
 
@@ -40,7 +46,7 @@ describe("test native methods of SwitchCase", () => {
     const params = {
       winScrollY: 100,
       winHeight: 300
-    }
+    };
 
     caseSwitch
       .setTargets(params)
@@ -51,7 +57,11 @@ describe("test native methods of SwitchCase", () => {
     params.winHeight = 200;
     caseSwitch
       .setTargets(params)
-      .match([`winScrollY < winHeight - 200`, `winScrollY > winHeight - 200`], "case 1 is true", "OR")
+      .match(
+        [`winScrollY < winHeight - 200`, `winScrollY > winHeight - 200`],
+        "case 1 is true",
+        "OR"
+      )
       .match("true", "I lied it's false", "SIMPLE")
       .end((debug, vals) => expect(vals).toBe("case 1 is true"));
   });
@@ -60,9 +70,9 @@ describe("test native methods of SwitchCase", () => {
     const params = {
       winScrollY: 100,
       winHeight: 300
-    }
+    };
 
-		caseSwitch
+    caseSwitch
       .setTargets({ name: "skills" })
       .match(`'name' === "skills"`, true, "SIMPLE")
       .end((debug, results) => expect(results).toBeFalsy());
@@ -74,16 +84,15 @@ describe("test native methods of SwitchCase", () => {
   });
 
   test("returning value in end, will turned the whole chain into an expression", () => {
-  	const name = "home";
-  	const resultOfMatch = 
-  	caseSwitch
+    const name = "home";
+    const resultOfMatch = caseSwitch
       .setTargets({ name })
       .match(`name === "skills"`, "It's skills", "SIMPLE")
       .match(`name === "about"`, "It's about", "SIMPLE")
       .match(`name === "home"`, "It's home", "SIMPLE")
       .end((debug, result) => result);
 
-   	expect(resultOfMatch).toBe("It's home");
+    expect(resultOfMatch).toBe("It's home");
   });
 
   test("match also accepts function as first argument", () => {
@@ -107,29 +116,32 @@ describe("test native methods of SwitchCase", () => {
       .match("true", "It's something else", "SIMPLE")
       .end((debug, result) => {
         debug();
-        expect(result).toBe("It's my home")
+        expect(result).toBe("It's my home");
       });
   });
-  
+
   test("_evaluatOne and _evaluateMany can be simply one expression, _evaluate", () => {
-    const expressions = ["name === 'hello'", "name === 'world'", "name === 'expression'"];
+    const expressions = [
+      "name === 'hello'",
+      "name === 'world'",
+      "name === 'expression'"
+    ];
     expect(
-      caseSwitch.setTargets({ name: "hello" })._evaluate(
-        caseSwitch._setExpression(expressions), "SIMPLE"
-      )
+      caseSwitch
+        .setTargets({ name: "hello" })
+        ._evaluate(caseSwitch._setExpression(expressions), "SIMPLE")
     ).toBe(true);
 
     expect(
-      caseSwitch.setTargets({ name: "expression" })._evaluate(
-        caseSwitch._setExpression(expressions), "OR"
-      )
+      caseSwitch
+        .setTargets({ name: "expression" })
+        ._evaluate(caseSwitch._setExpression(expressions), "OR")
     ).toBe(true);
 
     expect(
-      caseSwitch.setTargets({ name: "expression" })._evaluate(
-        caseSwitch._setExpression(expressions), "AND"
-      )
+      caseSwitch
+        .setTargets({ name: "expression" })
+        ._evaluate(caseSwitch._setExpression(expressions), "AND")
     ).toBe(false);
   });
-  
 });

@@ -2,7 +2,7 @@
 
 /** Class SwitchCase handles underlying functions
 * Compare.setTargets(...targets)
-* @param {[objects]} ...targets - bundle indefinite amount of objects into array  
+* @param {[objects]} ...targets - bundle indefinite amount of objects into array
 *
 * Compare.match(exp, values, fn, flag)
 * @param {string || array || function} exp - matching expression
@@ -28,7 +28,7 @@ class SwitchCase {
     this.isMatched = false;
     this.result = null;
   }
-  
+
   setTargets(...targets) {
     this._testForError("targets", targets);
     const collection = { targets: {}, args: [], values: [] };
@@ -78,24 +78,18 @@ class SwitchCase {
 
   _evaluate(expr, flag) {
     this._testForError("falseFlag", flag);
+    this.expLog = new Map();
+    const matchMany = (exprs, targets, pass = [], fail = []) => {
+      exprs.forEach(exp => this._matchingExpression(exp, targets) ? pass.push(exp) : fail.push(exp));
+      fail.length && this.expLog.set("fail", fail);
+      pass.length && this.expLog.set("pass", pass);
+      return this.expLog;
+    }
+
     return {
       SIMPLE: (exp, targets) => this._matchingExpression(exp.get(0), targets),
-      OR: (exprs, targets) => {
-        for (let exp of exprs) {
-          if (this._matchingExpression(exp[1], targets)) {
-            return true;
-          }
-        }
-        return false;
-      },
-      AND: (exprs, targets) => {
-        for (let exp of exprs) {
-          if (!this._matchingExpression(exp[1], targets)) {
-            return false;
-          }
-        }
-        return true;
-      }
+      OR: (exprs, targets) => matchMany(exprs, targets).has("pass") ? true : false,
+      AND: (exprs, targets) => matchMany(exprs, targets).has("fail") ? false : true
     }[flag](expr, this.testTargets);
   }
 
@@ -131,13 +125,13 @@ class SwitchCase {
         }
       },
       filter: exp => {
-        if (typeof exp === "function") { 
-          return true; 
+        if (typeof exp === "function") {
+          return true;
         }
-        if (exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) { 
+        if (exp.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
           throw new Error("Expression must be single-statement-only");
         }
-      }  
+      }
     }[name](val);
   }
 }
