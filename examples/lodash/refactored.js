@@ -51,9 +51,8 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
       // Invalid dates are coerced to `NaN`.
       .toCaseOR(claims("3"), eq(+object, +other))
       .toCaseAND(claims("4"), true)
-      // Coerce regexes to strings and treat strings, primitives and objects,
-      // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
-      // for more details.
+      // Coerce regexes to strings and treat strings, primitives and objects, as equal.
+      // See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring for more details.
       .toCaseOR(claims("5"), equal(object, other + ''))
       .toCaseOR(claims("6"), equal(tag, mapTag) && mapToArray, specificAction)
       .toCase(claims("7"), symbolValueOf && equal(symbolValueOf.call(object), symbolValueOf.call(other)))
