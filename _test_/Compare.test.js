@@ -144,7 +144,10 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toCase("<= 15", false)
 			.toCase(">= 50", true)
 			.toAllOther("wierd should match")
-			.Ended((debug, result) => expect(result).toBe(true));
+			.Ended((debug, result) => {
+				debug();
+				expect(result).toBe(true)
+			});
 
 		compare({ num1 })
 			.toCase("< 15", false)
@@ -190,12 +193,11 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 		const name = "71emj";
 
 		compare({ name })
-			.toCaseAND([ ex4, ex2.length === ex3.length ], true)
+			.toCaseAND([ ex4, ex2.length === ex3.length, "!= ex3" ], true)
 			.toAllOther(false)
 			.Ended((debug, result) => {
 				debug();
 				expect(result).toBe(true)
 			});
-
 	});
 });

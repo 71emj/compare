@@ -24,7 +24,7 @@ class SwitchInterface extends SwitchCase {
   }
 
   toAllOther(vals, fn) {
-    this.match("true", vals, fn, "SIMPLE");
+    this.match(true, vals, fn, "SIMPLE");
     return this;
   }
 
@@ -66,11 +66,12 @@ class SwitchInterface extends SwitchCase {
     if (this._type(exprs, "function")) {
       return exprs;
     }
-
     const name = this.testTargets.args[0];
     const mapping = expr => {
-      const simple = expr.toString().match(/^\b([\w]+)\b$|^([><=]={0,2})([\s.\d]+)$/);
-      return simple ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"` : expr;
+      const simple = expr.toString().match(/^\b([\w]+)\b$|^([!><=]={0,2})([\s.\w]+)$/);
+      return simple && !this._type(expr, "boolean")
+        ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"`
+        : expr;
     }; // mathcing in sequence of "value", "operator", "following value"
     return exprs.map(mapping);
   }

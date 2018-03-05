@@ -51,7 +51,7 @@ describe("test native methods of SwitchCase", () => {
     caseSwitch
       .setTargets(params)
       .match([`winScrollY < winHeight - 200`], "case 1 is true", "SIMPLE")
-      .match("true", "I lied it's false", "SIMPLE")
+      .match(true, "I lied it's false", "SIMPLE")
       .end((debug, vals) => expect(vals).toBe("I lied it's false"));
 
     params.winHeight = 200;
@@ -62,7 +62,7 @@ describe("test native methods of SwitchCase", () => {
         "case 1 is true",
         "OR"
       )
-      .match("true", "I lied it's false", "SIMPLE")
+      .match(true, "I lied it's false", "SIMPLE")
       .end((debug, vals) => expect(vals).toBe("case 1 is true"));
   });
 
@@ -102,7 +102,7 @@ describe("test native methods of SwitchCase", () => {
     caseSwitch
       .setTargets({ name })
       .match(exp, "It's home", "SIMPLE")
-      .match("true", "It's something else", "SIMPLE")
+      .match(true, "It's something else", "SIMPLE")
       .end((debug, result) => expect(result).toBe("It's home"));
   });
 
@@ -112,7 +112,7 @@ describe("test native methods of SwitchCase", () => {
 
     caseSwitch
       .setTargets({ name })
-      // .match(exp, "It's home", result => "It's my home", "SIMPLE")
+      .match(exp, "It's home", result => "It's my home", "SIMPLE")
       .match(true, "It's something else", "SIMPLE")
       .end((debug, result) => {
         debug();

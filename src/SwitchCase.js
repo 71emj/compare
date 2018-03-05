@@ -118,8 +118,7 @@ class SwitchCase {
       },
       "bad expression": exprs => {
         const check = elem => this._type(exprs, elem);
-        const invalidType = !["string", "function", "array"].filter(check).length;
-        if (invalidType) {
+        if (!["boolean", "string", "function", "array"].filter(check)[0]) {
           console.log("I should get an error");
           throw new TypeError("An expression must be a string, array of string, or a function");
         }
@@ -132,6 +131,9 @@ class SwitchCase {
       "bad syntax": expr => {
         if (this._type(expr, "function")) {
           return true;
+        }
+        if (this._type(expr, "boolean")) {
+          return false;
         }
         if (expr.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
           throw new Error("Expression must be single-statement-only");
