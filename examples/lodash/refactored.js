@@ -8,7 +8,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
   // a very specific action is performed in the original script,
   // by separating it from the chain, it became a lot easier to read and maintain
-  const specificAction = (convert = setToArray) => {
+  const specificAction = (mapToArray, convert = mapToArray || setToArray) => {
     var isPartial = bitmask & COMPARE_PARTIAL_FLAG;
     if (object.size != other.size && !isPartial) {
       return false;
