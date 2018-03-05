@@ -41,6 +41,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
   return (
     compare({ tag })
+      // testResult === equalfunc
       .toCaseAND(claims("1"), equalfunc, testResult => {
         object = object.buffer;
         other = other.buffer;
