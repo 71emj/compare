@@ -32,7 +32,7 @@ describe("test native methods of SwitchCase", () => {
 
   test("_setExpression should take in a string, array, and function and return a Map", () => {
     expect(
-      caseSwitch._setExpression([
+      caseSwitch._setClaim([
         "hello",
         "world",
         "expression",
@@ -112,8 +112,8 @@ describe("test native methods of SwitchCase", () => {
 
     caseSwitch
       .setTargets({ name })
-      .match(exp, "It's home", result => "It's my home", "SIMPLE")
-      .match("true", "It's something else", "SIMPLE")
+      // .match(exp, "It's home", result => "It's my home", "SIMPLE")
+      .match(true, "It's something else", "SIMPLE")
       .end((debug, result) => {
         debug();
         expect(result).toBe("It's my home");
@@ -129,31 +129,38 @@ describe("test native methods of SwitchCase", () => {
     expect(
       caseSwitch
         .setTargets({ name: "hello" })
-        ._evaluate(caseSwitch._setExpression(expressions), "SIMPLE")
+        ._evaluate(caseSwitch._setClaim(expressions), "SIMPLE")
     ).toBe(true);
 
     expect(
       caseSwitch
         .setTargets({ name: "expression" })
-        ._evaluate(caseSwitch._setExpression(expressions), "OR")
+        ._evaluate(caseSwitch._setClaim(expressions), "OR")
     ).toBe(true);
 
     expect(
       caseSwitch
         .setTargets({ name: "expression" })
-        ._evaluate(caseSwitch._setExpression(expressions), "AND")
+        ._evaluate(caseSwitch._setClaim(expressions), "AND")
     ).toBe(false);
   });
 
-  test("new debug ", () => {
+  test("value can be an expression", () => {
     const name = "home";
     caseSwitch
       .setTargets({ name })
       .match(`name === "skills"`, "It's skills", "SIMPLE")
       .match(`name === "about"`, "It's about", "SIMPLE")
-      .match(`name === "home"`, "It's home", "SIMPLE")
+      .match(`name === "home"`, true && "It's home", "SIMPLE")
       .end((debug, result) => {
         debug();
+        expect(result).toBe("It's home");
       });
+
+    // const testExp = array => array.filter(elem => name === elem);
+    // caseSwitch
+    //   .setTargets({ name })
+    //   .match("name === 'home'", )
+
   })
 });

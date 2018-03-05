@@ -170,4 +170,32 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 			.toAllOther("It's false")
 			.Ended((debug, result) => debug("targets"));
   });
+
+	test("instead of string, array, or function expression can be invoked function, array.filter", () => {
+		const ex1 = "hello", ex2 = "my", ex3 = "is", ex4 = "71emj";
+		const pair = array => array.filter(elem => name === elem);
+		const name = "71emj";
+
+		compare({ name })
+			.toCaseOR([ ex1, ex2 ], "It's true")
+			.toCase(pair([ex1, ex2, ex3, ex4]), true)
+			.Ended((debug, result) => {
+				debug();
+				expect(result).toBe(true)
+			});
+	});
+
+	test("expression can take, number or boolean as well", () => {
+		const ex1 = "hello", ex2 = "my", ex3 = "is", ex4 = "71emj";
+		const name = "71emj";
+
+		compare({ name })
+			.toCaseAND([ ex4, ex2.length === ex3.length ], true)
+			.toAllOther(false)
+			.Ended((debug, result) => {
+				debug();
+				expect(result).toBe(true)
+			});
+
+	});
 });
