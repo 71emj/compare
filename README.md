@@ -4,8 +4,7 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases.
 
-<strong>patch note 1.3.0</strong>
-* Now debug will display pass/fail of each evaluated cases (cases before matched)
+<strong>patch note 1.3.2</strong> Now all matching methods support Boolean type as expression, see [mixing-type](#mixing-expression-type) for more info on how to leverage this feature.
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
@@ -75,6 +74,7 @@ With Compare you can simply pass whatever variable(s) you wish to evaluate in th
 ## Features
 * Basic name-value matching similar to switch.
 * Multiple case matching, supporting || and && operators.
+* Supports a variety of expression-type including, Boolean, Number, String, and Function. see [Mixing Type](#mixing-expression-type)
 * Allows infinite chaining, with exception of attaching methods to end case method, see [Ended](#compareendedcallbackdebug-result).
 * Basic debug function passed as first argument in end case method (see [Ended](#compareendedcallbackdebug-result)), allowed user to see the parameters passed as matching targets.
 * Individual case can take second/third argument as variable/callback/both, see [toCase](#comparetocaseexpression-value-callback).
@@ -183,8 +183,6 @@ However, this pattern also encourages repetition as the code may be doing simila
 
 In addition an optional return can be used in the callback function, transforming the evaluation chain into an expression.
 
-<strong>1.3.0: </strong>now every cases that has been inspected will be record by Compare. User can call debug() to see how each expression is matched (pass/fail).
-
 ```js
 // basic
 compare({ name: "home" })
@@ -219,10 +217,34 @@ const filtering = elem => compare({ elem })
 const newArray = array.filter(filtering);
 ```
 
+#### debug
+<strong>1.3.0+ </strong>now every cases that has been inspected will be recorded by Compare. User can invoke debug() to see how each expression is matched (pass/fail).
+
+Consider having a chain of comparison and the result is not what you expected. You now invoke debug in Ended:
+```js
+const num = 100;
+
+compare({ num })
+  .toCase("<= 15", "I want this")
+  .toCase(">= 50", "But this is what I'll get")
+  .toAllOther("wierd should match")
+  .Ended((debug, result) => {
+    debug();
+    expect(result).toBe("I want this"); // obviously, I was wrong :P
+  }); // don't worry, debug to the rescue XD
+```
+In console you'll see something like this...
+```
+{ targets: { targets: { num: 100 }, args: [ 'num' ], vals: [ 100 ] },
+  cases:
+    [ Map { 'fail' => 'num <= " 15"' },
+      Map { 'pass' => 'num >= " 50"' } ] } // duh, num should be larger than 15
+```
+Now you see what went wrong :)
+
 ## Advance Features
 
 ### Passing function as expression
-
 Considering scenario where you need to evaluate JSON received from a remote API. Since the format and structure is unknown to you, in order to start matching data nested within you need to take several steps to parse it into workable format. Passing function to as evaluation strategy can be a good way to do it:
 
 ```js
@@ -276,7 +298,6 @@ compare(dataObj)
 ```
 
 ### Passing callback at end of a case
-
 Callback can be passed as second argument (or third argument if value have been given) to matching methods. Generally you would want to avoid doing this, as it creates repetition. However in situation where individual cases require specific action to be done, ex. making an Ajax call, setting unique action at specific case becomes valuable.
 
 ```js
@@ -292,8 +313,55 @@ compare({ type: query[1], value: query[2] })
   .toAllOther("nothing matched")
   .Ended((debug, result) => console.log(result)); // if matched, getVal
 ```
-
 As shown in the example above, callback perform a specific action to fetch data from a remote API when case3 is matched. Returning the value in the callback will save it as result, which can later received by Ended.
+
+### Mixing expression type
+Compare supports a variety of types when it comes to evaluating expression, Boolean, Number, String, and Function. Each of the supported type are designed to use in different scenario to minimize repetition in your code. To leverage the most out of this philosophy we can use simple expression with mix-type evaluation.
+
+considering having to transform a statement like this:
+```js
+const name = [ "Bruce", "Wayne", "71emj" ][Math.floor(Math.random() * 3)];
+
+switch(name) {
+  case "Bruce":
+    if (something.else !== others) {
+      return false;
+    }
+    return true;
+  case "Wayne":
+    if (thisthing === thatthing) {
+      return true;
+    }
+    return false;
+  case "71emj":
+    ....
+  default:
+    console.log("well it this is the end");
+}
+```
+
+With single-type expression, it's still hard to comprehend:
+```js
+// With single-type expression
+compare({ name, something, others, thisthing, thatthing })
+  .toCaseAND(["name === 'Bruce'", "something.else === others"], true)
+  .toCaseAND(["name === 'Wayne'", "thisTing === thatThing"], true)
+  .toCaseAND(["name === '71emj'", ...], true)
+  .toAllOther(false)
+  .Ended(...); // even for such short snippets, it's getting a lot bigger than it should be
+
+// With mix-type
+// since the only constant in the chain is matching name to [ "Bruce", "Wayne", "71emj" ]
+// name is the only target needed to be passed in, this way we can leverage simple expression
+const equal = (arg1, arg2) => arg1 === arg2;
+compare({ name })
+  .toCaseAND(["Bruce", equal(somthing.else, others)], true)
+  .toCaseAND(["Wayne", equal(thisThing, thatThing)], true)
+  .toCaseAND(["71emj", ...], true)
+  .toAllOther(false)
+  .Ended(...); // now it's readable again
+```
+With mix-type we can easily choose our methods base on the complexity of the evaluation without increasing the complexity of the chain. [see example](examples/lodash/)
 
 ### Security
 
