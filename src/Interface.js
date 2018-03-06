@@ -1,80 +1,95 @@
 // @flow
 const SwitchCase = require("./SwitchCase");
 
-class SwitchInterface extends SwitchCase {
-  _init(isSimple, rules) {
-    this.rules = rules;
-    this.simpleExp = isSimple;
-    return this;
-  }
+function InterfaceClosure(simpleExp, config) {
+  const self = new SwitchCase();
 
-  toCase(exprs, vals, fn) {
-  	this.match(this._interpret(exprs), vals, fn, "SIMPLE");
-    return this;
-  }
+  const Interface = Object.create({});
+  const securityConfig = {
+    limit: 50,
+    keywords: ["document", "window", "process"]
+  };
+  const rules = Object.assign(securityConfig, config);
 
-  toCaseOR(exprs, vals, fn) {
-  	this.match(this._interpret(exprs), vals, fn, "OR");
-  	return this;
+  /** Helpers to support interface functionality
+  * debug
+  * @param {string} opts - takes a string to specified behavior
+  * filter
+  * @param {array} exprs - filter prohibited syntax
+  * verbose
+  * @param {array} exprs - transform simple expression into verbose form, "home" --> name === "home"
+  * interpret
+  * @param {array || string} expr - interface to verbose + filter
+  */
+  const debug = opts => {
+    const targets = opts ? self.testTargets[opts] : self.testTargets
+    console.log({ targets, cases: self.history });
   }
-
-  toCaseAND(exprs, vals, fn) {
-    this.match(this._interpret(exprs), vals, fn, "AND");
-    return this;
+  const filter = exprs => {
+    const pattern = `${rules.keywords.join("|")}|.{${rules.limit},}`;
+    const regexp = new RegExp(pattern);
+    const testing = elem => !self._type(elem, "function") && regexp.test(elem) ? true : false;
+    return !!exprs.filter(testing)[0];
   }
-
-  toAllOther(vals, fn) {
-    this.match(true, vals, fn, "SIMPLE");
-    return this;
+  const verbose = exprs => {
+      if (self._type(exprs, "function")) {
+        return exprs;
+      }
+      const name = self.testTargets.args[0];
+      const mapping = expr => {
+        const simple = expr.toString().match(/^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/);
+        return simple && !self._type(expr, "boolean")
+          ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"`
+          : expr;
+      }; // mathcing in sequence of "value", "operator", "following value"
+      return exprs.map(mapping);
   }
-
-  Ended(fn) {
-    const debug = opts => {
-      const targets = opts ? this.testTargets[opts] : this.testTargets
-      console.log({ targets, cases: this.history });
-    }
-    return fn(debug, this.result);
-  }
-
-  _interpret(expr) {
-  	const exprs = this._isArray(expr);
-    if (this._screen(exprs)) {
+  const interpret = expr => {
+    const exprs = self._isArray(expr);
+    if (filter(exprs)) {
       throw new Error(
-        `individual expression must not exceed more than ${this.rules.limit} characters ` +
-        `and must not contain keywords such as ${this.rules.keywords.join(", ")} etc.`
+        `individual expression must not exceed more than ${rules.limit} characters ` +
+        `and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
       );
     }
-    return this.simpleExp ? this._verbose(exprs) : exprs;
+    return simpleExp ? verbose(exprs) : exprs;
   }
 
-  _screen(exprs) {
-    const pattern = `${this.rules.keywords.join("|")}|.{${this.rules.limit},}`;
-    const regexp = new RegExp(pattern);
 
-    for (let i = 0, len = exprs.length; i < len; i++) {
-      if (this._type(exprs[i], "function")) {
-        continue;
-      }
-      if (regexp.test(exprs[i])) {
-        return true;
-      }
+  /** Defining interface methods
+  *
+  */
+  const setTargets = function(arg) {
+    self.setTargets(arg);
+    return this;
+  }
+  const toCase = function(flag) {
+    return function(exprs, vals, fn) {
+      self.match(interpret(exprs), vals, fn, flag);
+      return this;
     }
-    return false;
+  }
+  const toAllOther = function(vals, fn) {
+    self.match(true, vals, fn, "SIMPLE");
+    return this;
+  }
+  const Ended = function(fn) {
+    return fn(debug, self.result);
   }
 
-  _verbose(exprs) {
-    if (this._type(exprs, "function")) {
-      return exprs;
-    }
-    const name = this.testTargets.args[0];
-    const mapping = expr => {
-      const simple = expr.toString().match(/^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/);
-      return simple && !this._type(expr, "boolean")
-        ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"`
-        : expr;
-    }; // mathcing in sequence of "value", "operator", "following value"
-    return exprs.map(mapping);
-  }
+  Object.defineProperty(Interface, "setTargets", {
+      value: setTargets,
+      writable: false
+  });
+
+  Interface.toCase = toCase("SIMPLE");
+  Interface.toCaseOR = toCase("OR");
+  Interface.toCaseAND = toCase("AND");
+  Interface.toAllOther = toAllOther;
+  Interface.Ended = Ended;
+
+  console.log(Interface);
+  return Interface;
 }
 
-module.exports = SwitchInterface;
+module.exports = InterfaceClosure;
