@@ -1,6 +1,6 @@
 {
   "name": "case-compare",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "An alternative to vanilla switch",
   "main": "index.js",
   "scripts": {
