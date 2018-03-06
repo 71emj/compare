@@ -157,10 +157,13 @@ describe("test native methods of SwitchCase", () => {
         expect(result).toBe("It's home");
       });
 
-    // const testExp = array => array.filter(elem => name === elem);
-    // caseSwitch
-    //   .setTargets({ name })
-    //   .match("name === 'home'", )
-
+    const testExp = array => array.filter(elem => name === elem);
+    caseSwitch
+      .setTargets({ name })
+      .match("name === 'home'", true && "It's home", result => result, "SIMPLE")
+      .end((debug, result) => {
+        debug();
+        expect(result).toBe("It's home");
+      });
   })
 });

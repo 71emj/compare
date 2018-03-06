@@ -96,6 +96,7 @@ class SwitchCase {
   _matchExp(expr, { targets, args, vals }) {
     const isFunction = this._filter("bad syntax", expr);
     const statement = "return " + expr;
+    console.log(statement);
     try {
       return isFunction ? expr(targets) : new Function(...args, statement)(...vals);
     } catch (err) { throw err; }
