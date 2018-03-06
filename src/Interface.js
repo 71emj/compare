@@ -68,7 +68,7 @@ class SwitchInterface extends SwitchCase {
     }
     const name = this.testTargets.args[0];
     const mapping = expr => {
-      const simple = expr.toString().match(/^\b([\w]+)\b$|^([!><=]={0,2})([\s.\w]+)$/);
+      const simple = expr.toString().match(/^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/);
       return simple && !this._type(expr, "boolean")
         ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"`
         : expr;
