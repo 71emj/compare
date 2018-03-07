@@ -4,8 +4,6 @@ describe("transform Interface object to closure", () => {
   let controller;
 
   beforeAll(() => {
-    console.log(require("../src/Interface"));
-    console.log(InterfaceClosure);
     controller = InterfaceClosure();
   });
 
@@ -34,8 +32,4 @@ describe("transform Interface object to closure", () => {
         expect(result).toBe(false);
       });
   });
-
-
-
-
 });

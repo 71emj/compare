@@ -1,10 +1,9 @@
 // @flow
 
 /** Class SwitchCase handles underlying functions
-* Compare.setTargets(...targets)
+* setTargets(...targets)
 * @param {[objects]} ...targets - bundle indefinite amount of objects into array
-*
-* Compare.match(expr, vals, fn, flag)
+* match(expr, vals, fn, flag)
 * @param {string || array || function} expr - matching expression
 * @param {any} vals - the data user wish to receive on matched case
 * @param {function} fn - an optionale callback

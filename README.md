@@ -4,7 +4,10 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases.
 
-<strong>patch note 1.3.2</strong> Now all matching methods support Boolean type as expression, see [mixing-type](#mixing-expression-type) for more info on how to leverage this feature.
+<strong>patch note 1.3.0+</strong>
+* Debug now display all evaluated cases, see [debug](#debug).
+* Support Boolean as expression, see [Mixing Type](#mixing-expression-type).
+* 1.3.4 Interface is redesigned to closure instead of class inheritance.
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
@@ -218,19 +221,19 @@ const newArray = array.filter(filtering);
 ```
 
 #### debug
-<strong>1.3.0+ </strong>now every cases that has been inspected will be recorded by Compare. User can invoke debug() to see how each expression is matched (pass/fail).
+<strong>1.3.0+ </strong>now every cases that has been inspected will be record by Compare. User can call debug() to see how each expression is matched (pass/fail).
 
 Consider having a chain of comparison and the result is not what you expected. You now invoke debug in Ended:
 ```js
 const num = 100;
 
 compare({ num })
-  .toCase("<= 15", "I want this")
-  .toCase(">= 50", "But this is what I'll get")
+  .toCase("<= 15", false)
+  .toCase(">= 50", true)
   .toAllOther("wierd should match")
   .Ended((debug, result) => {
     debug();
-    expect(result).toBe("I want this"); // obviously, I was wrong :P
+    expect(result).toBe(false); // obviously, I was wrong :P
   }); // don't worry, debug to the rescue XD
 ```
 In console you'll see something like this...
@@ -361,7 +364,7 @@ compare({ name })
   .toAllOther(false)
   .Ended(...); // now it's readable again
 ```
-With mix-type we can easily choose our methods base on the complexity of the evaluation without increasing the complexity of the chain. [see example](examples/lodash/)
+With mix-type we can easily choose our methods base on the complexity of the evaluation without increasing the complexity of the chain. [see examples](examples/)
 
 ### Security
 

@@ -2,8 +2,8 @@
 const SwitchCase = require("./SwitchCase");
 
 function InterfaceClosure(simpleExp, config) {
+  "use strict";
   const self = new SwitchCase();
-
   const Interface = Object.create({});
   const securityConfig = {
     limit: 50,
@@ -55,12 +55,24 @@ function InterfaceClosure(simpleExp, config) {
     return simpleExp ? verbose(exprs) : exprs;
   }
 
-
-  /** Defining interface methods
-  *
+  /** Interface methods
+  * setTargets
+  * @param {obj} args - this is a private interface for switchCase's setTargets method
+  * toCase
+  * @param {string} flag - a factory function to generate different format of match methods
+  * toCase("SIMPLE")/toCase("OR")/toCase("AND")
+  * @param {string || number || boolean || function} exprs - expression can be in a variety of type
+  * @param {any} vals - the value pass to switchCase when matched
+  * @param {fn} fn - callback function (optional), can be use to perform specific action after matched
+  * @param {string} flag - flag match to use the correct method to process input
+  * toAllOther - passing true to switchCase.match, making it the "default" case
+  * @param {any} vals - the value pass to switchCase when matched
+  * @param {function} fn - callback function, see toCase(..., fn)
+  * Ended
+  * @param {function} fn - callback function
   */
-  const setTargets = function(arg) {
-    self.setTargets(arg);
+  const setTargets = function(...args) {
+    self.setTargets(...args);
     return this;
   }
   const toCase = function(flag) {
@@ -88,7 +100,6 @@ function InterfaceClosure(simpleExp, config) {
   Interface.toAllOther = toAllOther;
   Interface.Ended = Ended;
 
-  console.log(Interface);
   return Interface;
 }
 
