@@ -57,9 +57,11 @@ function InterfaceClosure(simpleExp, config) {
 
   /** Interface methods
   * setTargets
-  * @param {obj} args - this is a private interface for switchCase's setTargets method
+  * @private
+  * @param {obj} args - This method act as intermediate to SwitchCase.setTargets
   * toCase
   * @param {string} flag - a factory function to generate different format of match methods
+  * @return {function}
   * toCase("SIMPLE")/toCase("OR")/toCase("AND")
   * @param {string || number || boolean || function} exprs - expression can be in a variety of type
   * @param {any} vals - the value pass to switchCase when matched

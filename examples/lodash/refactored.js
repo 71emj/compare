@@ -6,15 +6,15 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
   const equalfunc = equalFunc(new Uint8Array(object), new Uint8Array(other));
   const equal = (arg1, arg2) => arg1 == arg2;
 
-  // a very specific action is performed in the original script,
-  // by separating it from the chain, it became a lot easier to read and maintain
-  const specificAction = (mapToArray, convert = mapToArray || setToArray) => {
-    var isPartial = bitmask & COMPARE_PARTIAL_FLAG;
+  // setTag is the function passed when tag === setTag
+  const setTag = mapToArray => {
+    const isPartial = bitmask & COMPARE_PARTIAL_FLAG;
+    const convert = mapToArray || setToArray;
     if (object.size != other.size && !isPartial) {
       return false;
     }
     // Assume cyclic values are equal.
-    var stacked = stack.get(object);
+    let stacked = stack.get(object);
     if (stacked) {
       return stacked == other;
     }
@@ -22,12 +22,13 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
 
     // Recursively compare objects (susceptible to call stack limits).
     stack.set(object, other);
-    var result = equalArrays(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
+    const result = equalArrays(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
     stack['delete'](object);
     return result;
   }
 
-  const claims = caseName => {
+  // this is all the cases that can be easily matched with Compare
+  const cases = caseName => {
     "1": [ dataViewTag, equal(object.byteLength, other.byteLength),
       equal(object.byteOffset, other.byteOffset)
     ],
@@ -40,23 +41,20 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
   }[caseName];
 
   return (
+    // now if there is no bug in this chain of evaluaion
+    // we no longer have to worry about it in the future, changes can be made in the code above
     compare({ tag })
-      // testResult === equalfunc
-      .toCaseAND(claims("1"), equalfunc, testResult => {
+      .toCaseAND(cases("1"), () => {
         object = object.buffer;
         other = other.buffer;
-        return testResult;
+        return equalfunc;
       })
-      .toCaseAND(claims("2"), equalfunc)
-      // Coerce booleans to `1` or `0` and dates to milliseconds.
-      // Invalid dates are coerced to `NaN`.
-      .toCaseOR(claims("3"), eq(+object, +other))
-      .toCaseAND(claims("4"), true)
-      // Coerce regexes to strings and treat strings, primitives and objects, as equal.
-      // See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring for more details.
-      .toCaseOR(claims("5"), equal(object, other + ''))
-      .toCaseOR(claims("6"), equal(tag, mapTag) && mapToArray, specificAction)
-      .toCase(claims("7"), symbolValueOf && equal(symbolValueOf.call(object), symbolValueOf.call(other)))
+      .toCaseAND(cases("2"), equalfunc)
+      .toCaseOR(cases("3"), eq(+object, +other))
+      .toCaseAND(cases("4"), true)
+      .toCaseOR(cases("5"), equal(object, other + ''))
+      .toCaseOR(cases("6"), equal(tag, mapTag) && mapToArray, setTag)
+      .toCase(cases("7"), symbolValueOf && equal(symbolValueOf.call(object), symbolValueOf.call(other)))
       .toAllOther(false)
       .Ended((debug, result) => result)
   );

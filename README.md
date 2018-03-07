@@ -7,7 +7,7 @@ Compare is a zero-dependency library that evaluates complex case matching. Compa
 <strong>patch note 1.3.0+</strong>
 * Debug now display all evaluated cases, see [debug](#debug).
 * Support Boolean as expression, see [Mixing Type](#mixing-expression-type).
-* 1.3.4 Interface is redesigned to closure instead of class inheritance.
+* 1.3.5 Interface is redesigned to closure instead of class inheritance.
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
@@ -96,7 +96,7 @@ With Compare you can simply pass whatever variable(s) you wish to evaluate in th
 Following contents are a list of methods for utilizing Compare
 
 ### Compare.toCase(expression[, value[, callback]])
-toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statment in each case, only the first expression in an array is evaluated in this method (see [toCaseOR](#comparetocaseorexpressions-value-callback), [toCaseAND](#comparetocaseandexpressions-value-callback) for multiple expression evaluation).
+toCase is similar to "case" in vanilla switch. The expression can be either a string or an array. However since the toCase is designed to match one statement in each case, only the first expression in an array is evaluated in this method (see [toCaseOR](#comparetocaseorexpressions-value-callback), [toCaseAND](#comparetocaseandexpressions-value-callback) for multiple expression evaluation).
 
 <strong>note: </strong>since v1.2.0 toCase will dynamically adjust it's function base on the argument type, passing an array will have the method calls for evaluation on multiple expressions (toCaseOR).
 ```js
@@ -141,7 +141,7 @@ compare({ num1: 1000, num2: 2000 })
 ```
 
 ### Compare.toCaseAND(expressions[, value[, callback]])
-toCaseAND is another method that evaluates multiple expression in each cases. Contrary to toCaseOR, every statment in the said case must be truthful in order to flag matched.
+toCaseAND is another method that evaluates multiple expression in each cases. Contrary to toCaseOR, every statement in the said case must be truthful in order to flag matched.
 
 ```js
 // the toCaseAND is especially useful when matching a large amount of cases that needs to be true
@@ -342,20 +342,21 @@ switch(name) {
     console.log("well it this is the end");
 }
 ```
-
-With single-type expression, it's still hard to comprehend:
+If we're only using single-type expression, we really didn't do ourselves a favor.
 ```js
-// With single-type expression
-compare({ name, something, others, thisthing, thatthing })
+// With single-type "string" expression
+compare({ name, something, others, thisThing, thatThing })
   .toCaseAND(["name === 'Bruce'", "something.else === others"], true)
-  .toCaseAND(["name === 'Wayne'", "thisTing === thatThing"], true)
+  .toCaseAND(["name === 'Wayne'", "thisThing === thatThing"], true)
   .toCaseAND(["name === '71emj'", ...], true)
   .toAllOther(false)
   .Ended(...); // even for such short snippets, it's getting a lot bigger than it should be
-
-// With mix-type
-// since the only constant in the chain is matching name to [ "Bruce", "Wayne", "71emj" ]
-// name is the only target needed to be passed in, this way we can leverage simple expression
+```
+It's pretty ugly. However with mixed-type expression, we can make it pretty again.
+```js
+// once identified the most common match, this case the value of the variable name, we can create a simple expression to perform rest of the test.
+// With this philosophy in mind, you can easily modularize your code to remove repetition,
+// the process can take on as many iteration as possible until you are left with a very specific case matching, in which case you'll just have to write a custom expression to match that.
 const equal = (arg1, arg2) => arg1 === arg2;
 compare({ name })
   .toCaseAND(["Bruce", equal(somthing.else, others)], true)
@@ -364,7 +365,7 @@ compare({ name })
   .toAllOther(false)
   .Ended(...); // now it's readable again
 ```
-With mix-type we can easily choose our methods base on the complexity of the evaluation without increasing the complexity of the chain. [see examples](examples/)
+With mix-type we can easily choose our methods based on the complexity of the evaluation without directly impact the complexity of the chain, [see example](examples/) of how I use Compare to refactor a helper function in [lodash](#https://github.com/lodash/lodash) (great library btw).
 
 ### Security
 

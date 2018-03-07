@@ -1,6 +1,5 @@
 // @flow
-
-/** Class SwitchCase handles underlying functions
+/** @constructor SwitchCase - process all evaluation logics
 * setTargets(...targets)
 * @param {[objects]} ...targets - bundle indefinite amount of objects into array
 * match(expr, vals, fn, flag)
@@ -76,8 +75,8 @@ class SwitchCase {
 
   _evaluate(claim, flag) {
     this._filter("bad flag", flag);
-    const entry = new Map();
 
+    const entry = new Map();
     const pushTo = (name, expr) => name.push(this._type(expr, "function") ? "[Function]" : expr);
     const outline = (claim, targets, pass = [], fail = []) => {
       claim.forEach(expr => this._matchExp(expr, targets) ? pushTo(pass, expr) : pushTo(fail, expr));

@@ -3,7 +3,7 @@ const Interface = require("./Interface");
 
 function Compare(config: { limit: number, keywords: Array<string> }) {
 	"use strict";
-	/** Factory will initiate a new Interface with user input
+	/** @function Factory - initiate a Compare with user input to initiate Interface/SwitchCase
 	* @param {object} args - the targets user wish to compare with
 	* @param {arg} simpleExp - flag indicating user input is valid for simple expression
 	*/
