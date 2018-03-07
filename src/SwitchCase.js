@@ -1,10 +1,9 @@
 // @flow
 
 /** Class SwitchCase handles underlying functions
-* Compare.setTargets(...targets)
+* setTargets(...targets)
 * @param {[objects]} ...targets - bundle indefinite amount of objects into array
-*
-* Compare.match(expr, vals, fn, flag)
+* match(expr, vals, fn, flag)
 * @param {string || array || function} expr - matching expression
 * @param {any} vals - the data user wish to receive on matched case
 * @param {function} fn - an optionale callback
@@ -96,7 +95,6 @@ class SwitchCase {
   _matchExp(expr, { targets, args, vals }) {
     const isFunction = this._filter("bad syntax", expr);
     const statement = "return " + expr;
-    console.log(statement);
     try {
       return isFunction ? expr(targets) : new Function(...args, statement)(...vals);
     } catch (err) { throw err; }
@@ -120,7 +118,6 @@ class SwitchCase {
       "bad expression": exprs => {
         const check = elem => this._type(exprs, elem);
         if (!["boolean", "string", "function", "array"].filter(check)[0]) {
-          console.log("I should get an error");
           throw new TypeError("An expression must be a string, array of string, or a function");
         }
       },

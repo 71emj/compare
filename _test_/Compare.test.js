@@ -5,7 +5,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
 
   beforeAll(() => {
     compare = new Compare();
-  });
+	});
 
   test("the new Compare will return an interface wrapper of SwitchCase", () => {
     expect(typeof compare).toBe("function");
