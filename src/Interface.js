@@ -4,7 +4,7 @@ const SwitchCase = require("./SwitchCase");
 function InterfaceClosure(simpleExp, config) {
   "use strict";
   const self = new SwitchCase();
-  const Interface = Object.create({});
+  const Interface = {};
   const securityConfig = {
     limit: 50,
     keywords: ["document", "window", "process"]
@@ -41,7 +41,7 @@ function InterfaceClosure(simpleExp, config) {
         return simple && !self._type(expr, "boolean")
           ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"`
           : expr;
-      }; // mathcing in sequence of "value", "operator", "following value"
+      } // mathcing in sequence of "value", "operator", "following value"
       return exprs.map(mapping);
   }
   const interpret = expr => {
@@ -73,8 +73,8 @@ function InterfaceClosure(simpleExp, config) {
   * Ended
   * @param {function} fn - callback function
   */
-  const setTargets = function(...args) {
-    self.setTargets(...args);
+  const setTargets = function(target) {
+    self.setTargets(target);
     return this;
   }
   const toCase = function(flag) {

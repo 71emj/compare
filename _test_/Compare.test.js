@@ -169,7 +169,7 @@ describe("test Compare, a wrapper of SwitchCase", () => {
   });
 
   test("debug accepts an option string to direct console output", () => {
-    compare({ name: "home" })
+    compare({ name: "home" }, { target: "myhome" })
       .toCase("name === 'home'", "It's true!!")
       .toAllOther("It's false")
       .Ended((debug, result) => debug("targets"));

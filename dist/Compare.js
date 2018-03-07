@@ -3,7 +3,7 @@ const Interface = require("./Interface");
 
 function Compare(config                                            ) {
 	"use strict";
-	/** Factory will initiate a new Interface with user input
+	/** @function Factory - initiate a Compare with user input to initiate Interface/SwitchCase
 	* @param {object} args - the targets user wish to compare with
 	* @param {arg} simpleExp - flag indicating user input is valid for simple expression
 	*/
@@ -11,13 +11,15 @@ function Compare(config                                            ) {
 		if (!args) {
 			throw new Error("Argument cannot be empty");
 		}
-		if (typeof arguments[0] !== "object") {
+		const targets = Array.isArray(args) ? args : Array.from(arguments);
+		const isObject = item => typeof item === "object";
+		if (!targets.every(isObject)) {
 			throw new TypeError("Variable must be an object, or an array of objects");
 		}
-		const targets = Array.isArray(args) ? args : Array.from(arguments);
-		const simpleExp = Object.keys(args).length === 1;
+		const targetBody = targets.reduce((obj, item) => Object.assign(obj, item), {});
+		const simpleExp = Object.keys(targetBody).length === 1;
 		const switchCase = Interface(simpleExp, config);
-		return switchCase.setTargets(...targets);
+		return switchCase.setTargets(targetBody);
 	}
 	return Factory;
 }

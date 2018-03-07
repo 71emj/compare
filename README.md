@@ -4,10 +4,12 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases.
 
-<strong>patch note 1.3.0+</strong>
+<strong>patch note 1.3.0 - 1.3.6</strong>
 * Debug now display all evaluated cases, see [debug](#debug).
 * Support Boolean as expression, see [Mixing Type](#mixing-expression-type).
-* 1.3.5 Interface is redesigned to closure instead of class inheritance.
+* Interface now a closure instead of child class to SwitchCase.
+* Bug fix on Compare not throwing error when using simple expression with multiple targets.
+* Bug fix on uncaught error caused by passing non-object variable wrapped in an array.
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 
@@ -125,14 +127,8 @@ compare({ home: "home" })
   .Ended((debug, result) => console.log(result)); // "case 2 is true"
 
 // matching multiple variables to expression is also supported by this method
-// note that by passing more than one variable to evaluate, simple name-value is not supported
-compare({ home: "home", name: "71emj" })
-  .toCaseOR([ "home === 'halla'", "name === 'hishome'" ], "case 1 is true")
-  .toCaseOR([ "home === 'skills'", "name === '71emj'" ], "case 2 is true")
-  .toAllOther("nothing here")
-  .Ended((debug, result) => console.log(result)); // "case 2 is true"
-
-// the use case of toCaseOR can be extended to arithmetic evaluations
+// note that by passing more than one variable to evaluate, simple expression is not supported.
+// The use case of toCaseOR can be extended to arithmetic evaluations
 compare({ num1: 1000, num2: 2000 })
   .toCaseOR([ "num1 + 200 > num2", "num1 * 2 < num2" ], "case 1 is true")
   .toCaseOR([ "num2 * 2 / 15 + 10 * 0 - num1 <= 0", "num1 === num2" ], "case 2 is true")
@@ -151,7 +147,7 @@ compare({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
   .toAllOther("nothing here")
   .Ended((debug, result) => console.log(result)); // "case 1 is true"
 
-// the above can be break down to an even more concise structure by passing expressions as variables
+// the above can be broken down to an even more concise structure by passing expressions as variables
 // this pattern will effectively separate the evaluation process from definition (unlike switch or nested if/else)
 const expressions = {
   "one": "num1 < num2",
@@ -169,15 +165,19 @@ compare({ num1: 1000, num2: 2000, num3: 3000, num4: 5000 })
 ```
 
 ### Compare.toAllOther(value[, callback])
-toAllOther is equivalent to default in vanilla switch. Like default in vanilla switch, it's optional but highly suggested as best practice.
+toAllOther is a match all method, it is optional since for most cases Compare uses [Ended](#compare-ended-callback-debug-result) method to provide "default" functionality. However, when user don't required a specific needs for return value (or logic-in-one-place) toAllOther is a way to provide information.
 
 ```js
-compare({ home: null })
-  .toCaseOR([ "halla", "hishome" ], "not true")
-  .toCaseOR([ "home", "skills", "about" ], "true")
-  .toAllOther("nothing here")
-  .Ended((debug, result) => console.log("nothing here"));
+// In most cases compare uses Ended to perform a function that process data received from individual matched cases
+// However, there are situation where this may not applied since the functions required are largely differentiate from
+// each matched cases. toAllOther is a good way to invoke a catch-all function (say display nothing found to user) in these scenario.
+compare({ home: "some value" })
+  .toCaseOR([ "halla", "hishome" ], fetchAPIFromSourceA)
+  .toCaseOR([ "home", "skills", "about" ], fetchAPIFromSourceB)
+  .toCase("portfolio", fetchAPIFromSourceC)
+  .toAllOther("nothing matched", doSomethingAboutIt);
 ```
+toAllOther is also a good way to explicitly setup a default value for Ended to process (not necessary, but it provides clarity to code).
 
 ### Compare.Ended(callback(debug, result))
 Ended method has two important rolls: debug and process result. In a vanilla switch pattern, logic are nested in each cases so that when the case is true certain action can be taken.
@@ -221,7 +221,7 @@ const newArray = array.filter(filtering);
 ```
 
 #### debug
-<strong>1.3.0+ </strong>now every cases that has been inspected will be record by Compare. User can call debug() to see how each expression is matched (pass/fail).
+<strong>1.3.0+ </strong>Compare will record every cases that has been inspected and pass it back with debug. User can invoke debug() to see how each expression is matched (pass/fail).
 
 Consider having a chain of comparison and the result is not what you expected. You now invoke debug in Ended:
 ```js
@@ -230,7 +230,6 @@ const num = 100;
 compare({ num })
   .toCase("<= 15", false)
   .toCase(">= 50", true)
-  .toAllOther("wierd should match")
   .Ended((debug, result) => {
     debug();
     expect(result).toBe(false); // obviously, I was wrong :P

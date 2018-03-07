@@ -1,4 +1,4 @@
-import Compare from "../index";
+import Compare from "../src/Compare";
 import SwitchCase from "../src/SwitchCase";
 
 describe("test native SwitchCase error handling functions", () => {
@@ -52,7 +52,7 @@ describe("test Compare error handling functions", () => {
 
   test("throw error from test function", () => {
     expect(
-      () => { throw new Error("test") } 
+      () => { throw new Error("test") }
     ).toThrow(Error);
   });
 
@@ -66,11 +66,19 @@ describe("test Compare error handling functions", () => {
     expect(() => {
       compare(name).toCase("myhome", "not true").Ended((debug, result) => debug())
     }).toThrowError("Variable must be an object, or an array of objects");
+
+    expect(() => {
+      compare([name]).toCase(["Charlotte", "hello"], "invalid")
+    }).toThrowError("Variable must be an object, or an array of objects");
   });
 
   test("using simple expression while passing multiple more than one argument should throw Reference Error", () => {
     expect(() => {
       compare({ name: "hello", city: "Charlotte" }).toCase(["Charlotte", "hello"], "invalid")
+    }).toThrowError(ReferenceError);
+
+    expect(() => {
+      compare([{ name: "hello" }, { city: "Charlotte" }]).toCase(["Charlotte", "hello"], "invalid")
     }).toThrowError(ReferenceError);
   });
 });

@@ -1,6 +1,5 @@
 //      
-
-/** Class SwitchCase handles underlying functions
+/** @constructor SwitchCase - process all evaluation logics
 * setTargets(...targets)
 * @param {[objects]} ...targets - bundle indefinite amount of objects into array
 * match(expr, vals, fn, flag)
@@ -29,32 +28,28 @@ class SwitchCase {
     this.result = null;
   }
 
-  setTargets(...targets) {
-    this._filter("bad targets", targets);
-    const collection = { targets: {}, args: [], vals: [] };
+  setTargets(target) {
+    this._filter("bad targets", target);
 
-    const setArrToObj = (obj, item) => Object.assign(obj, item);
+    const collection = { targets: target, args: [], vals: [] };
     const setObjToMap = (collection, elem) => {
       collection.args.push(elem[0]);
       collection.vals.push(elem[1]);
       return collection;
-    };
-
-    collection.targets = targets.reduce(setArrToObj, {});
-    this.testTargets = Object.entries(collection.targets).reduce(setObjToMap, collection);
+    }
+    this.testTargets = Object.entries(target).reduce(setObjToMap, collection);
     return this;
   }
 
   match(exprs, vals, fn, flag) {
     this._filter("bad expression", exprs);
+
     if (this.matched) {
       return this;
     }
     [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
     [vals, fn] = this._type(vals, "function") ? [null, vals] : [vals, fn];
-
-    const claim = this._setClaim(exprs);
-    this._evaluate(claim, flag) && this._break(vals, fn);
+    this._evaluate(this._setClaim(exprs), flag) && this._break(vals, fn);
     return this;
   }
 
@@ -64,21 +59,22 @@ class SwitchCase {
   }
 
   _break(val, fn) {
-    this.matched = true;
     this.result = this._type(fn, "function") ? fn(val) : val;
-    return true;
+    return this.matched = true;
   }
 
   _setClaim(exprs) {
-    const exptoMap = (map, expr, index) => map.set(index, expr);
-    return this._isArray(exprs).reduce(exptoMap, new Map());
+    const expToMap = (map, expr, index) => map.set(index, expr);
+    return this._isArray(exprs).reduce(expToMap, new Map());
   }
 
   _evaluate(claim, flag) {
     this._filter("bad flag", flag);
-    const entry = new Map();
 
-    const pushTo = (name, expr) => name.push(this._type(expr, "function") ? "[Function]" : expr);
+    const entry = new Map();
+    const pushTo = (name, expr) => name.push(
+      this._type(expr, "function") ? "[Function]" : expr
+    );
     const outline = (claim, targets, pass = [], fail = []) => {
       claim.forEach(expr => this._matchExp(expr, targets) ? pushTo(pass, expr) : pushTo(fail, expr));
       fail.length && entry.set("fail", fail.join(" | "));
@@ -93,11 +89,12 @@ class SwitchCase {
   }
 
   _matchExp(expr, { targets, args, vals }) {
-    const isFunction = this._filter("bad syntax", expr);
-    const statement = "return " + expr;
     try {
+      const isFunction = this._filter("bad syntax", expr);
+      const statement = "return " + expr;
       return isFunction ? expr(targets) : new Function(...args, statement)(...vals);
-    } catch (err) { throw err; }
+    }
+    catch (err) { throw err; }
   }
 
   _isArray(claim) {
@@ -110,8 +107,8 @@ class SwitchCase {
 
   _filter(name, val) {
     return {
-      "bad targets": targets => {
-        if (!targets || !this._type(targets[0], "object")) {
+      "bad targets": target => {
+        if (!target || !this._type(target, "object")) {
           throw new TypeError("TestTargets cannot be null or undefined");
         }
       },
