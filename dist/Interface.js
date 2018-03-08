@@ -1,15 +1,15 @@
-//      
-const SwitchCase = require("./SwitchCase");
+var SwitchCase = require("./SwitchCase");
 
 function InterfaceClosure(simpleExp, config) {
   "use strict";
-  const self = new SwitchCase();
-  const Interface = {};
-  const securityConfig = {
+
+  var self = new SwitchCase();
+  var Interface = {};
+  var securityConfig = {
     limit: 50,
     keywords: ["document", "window", "process"]
   };
-  const rules = Object.assign(securityConfig, config);
+  var rules = Object.assign(securityConfig, config);
 
   /** Helpers to support interface functionality
   * debug
@@ -21,39 +21,36 @@ function InterfaceClosure(simpleExp, config) {
   * interpret
   * @param {array || string} expr - interface to verbose + filter
   */
-  const debug = opts => {
-    const targets = opts ? self.testTargets[opts] : self.testTargets
-    console.log({ targets, cases: self.history });
-  }
-  const filter = exprs => {
-    const pattern = `${rules.keywords.join("|")}|.{${rules.limit},}`;
-    const regexp = new RegExp(pattern);
-    const testing = elem => !self._type(elem, "function") && regexp.test(elem) ? true : false;
+  var debug = function debug(opts) {
+    var targets = opts ? self.testTargets[opts] : self.testTargets;
+    console.log({ targets: targets, cases: self.history });
+  };
+  var filter = function filter(exprs) {
+    var pattern = rules.keywords.join("|") + "|.{" + rules.limit + ",}";
+    var regexp = new RegExp(pattern);
+    var testing = function testing(elem) {
+      return !self._type(elem, "function") && regexp.test(elem) ? true : false;
+    };
     return !!exprs.filter(testing)[0];
-  }
-  const verbose = exprs => {
-      if (self._type(exprs, "function")) {
-        return exprs;
-      }
-      const name = self.testTargets.args[0];
-      const mapping = expr => {
-        const simple = expr.toString().match(/^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/);
-        return simple && !self._type(expr, "boolean")
-          ? `${name} ${simple[2] || (+expr ? "==" : "===")} "${simple[1] || simple[3]}"`
-          : expr;
-      } // mathcing in sequence of "value", "operator", "following value"
-      return exprs.map(mapping);
-  }
-  const interpret = expr => {
-    const exprs = self._isArray(expr);
+  };
+  var verbose = function verbose(exprs) {
+    if (self._type(exprs, "function")) {
+      return exprs;
+    }
+    var name = self.testTargets.args[0];
+    var mapping = function mapping(expr) {
+      var simple = expr.toString().match(/^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/);
+      return simple && !self._type(expr, "boolean") ? name + " " + (simple[2] || (+expr ? "==" : "===")) + " \"" + (simple[1] || simple[3]) + "\"" : expr;
+    }; // mathcing in sequence of "value", "operator", "following value"
+    return exprs.map(mapping);
+  };
+  var interpret = function interpret(expr) {
+    var exprs = self._isArray(expr);
     if (filter(exprs)) {
-      throw new Error(
-        `individual expression must not exceed more than ${rules.limit} characters ` +
-        `and must not contain keywords such as ${rules.keywords.join(", ")} etc.`
-      );
+      throw new Error("individual expression must not exceed more than " + rules.limit + " characters " + ("and must not contain keywords such as " + rules.keywords.join(", ") + " etc."));
     }
     return simpleExp ? verbose(exprs) : exprs;
-  }
+  };
 
   /** Interface methods
   * setTargets
@@ -73,27 +70,27 @@ function InterfaceClosure(simpleExp, config) {
   * Ended
   * @param {function} fn - callback function
   */
-  const setTargets = function(target) {
+  var setTargets = function setTargets(target) {
     self.setTargets(target);
     return this;
-  }
-  const toCase = function(flag) {
-    return function(exprs, vals, fn) {
+  };
+  var toCase = function toCase(flag) {
+    return function (exprs, vals, fn) {
       self.match(interpret(exprs), vals, fn, flag);
       return this;
-    }
-  }
-  const toAllOther = function(vals, fn) {
+    };
+  };
+  var toAllOther = function toAllOther(vals, fn) {
     self.match(true, vals, fn, "SIMPLE");
     return this;
-  }
-  const Ended = function(fn) {
+  };
+  var Ended = function Ended(fn) {
     return fn(debug, self.result);
-  }
+  };
 
   Object.defineProperty(Interface, "setTargets", {
-      value: setTargets,
-      writable: false
+    value: setTargets,
+    writable: false
   });
 
   Interface.toCase = toCase("SIMPLE");

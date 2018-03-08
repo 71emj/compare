@@ -93,8 +93,9 @@ class SwitchCase {
       const isFunction = this._filter("bad syntax", expr);
       const statement = "return " + expr;
       return isFunction ? expr(targets) : new Function(...args, statement)(...vals);
+    } catch (err) {
+      throw err;
     }
-    catch (err) { throw err; }
   }
 
   _isArray(claim) {

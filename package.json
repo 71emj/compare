@@ -4,7 +4,7 @@
   "description": "An alternative to vanilla switch",
   "main": "index.js",
   "scripts": {
-    "build": "flow-remove-types src/ -d dist/",
+    "build": "npx babel ./src --out-dir ./dist",
     "flow": "flow",
     "test": "jest --watchAll && flow"
   },
