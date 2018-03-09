@@ -3,7 +3,7 @@
 var Interface = require("./Interface");
 var Router = require("./Router");
 
-var _require = require("../util/Helpers"),
+var _require = require("./util/Helpers"),
     isType = _require.isType;
 
 function Compare() {

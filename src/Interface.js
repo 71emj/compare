@@ -1,8 +1,8 @@
 // @flow
 "use strict";
 const SwitchCase = require("./SwitchCase");
-const { Ended, toCase } = require("../util/CommonMethods");
-const { isType, notType, makeArray, matchExp } = require("../util/Helpers");
+const { Ended, toCase } = require("./util/CommonMethods");
+const { isType, notType, makeArray, matchExp } = require("./util/Helpers");
 
 function InterfaceClosure(simpleExp, config) {
   const self = new SwitchCase();

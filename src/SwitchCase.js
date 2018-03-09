@@ -1,6 +1,6 @@
 // @flow
 "use strict";
-const { isType, notType, swap, makeArray } = require("../util/Helpers");
+const { isType, notType, swap, makeArray } = require("./util/Helpers");
 
 /** @constructor SwitchCase - process all evaluation logics
 * setTargets(...targets)

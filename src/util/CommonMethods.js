@@ -1,4 +1,3 @@
-// @flow
 // commonMethods should be factory function set
 
 export function Ended(self, debug) {

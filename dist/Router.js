@@ -2,11 +2,11 @@
 
 var SwitchCase = require("./SwitchCase");
 
-var _require = require("../util/CommonMethods"),
+var _require = require("./util/CommonMethods"),
     Ended = _require.Ended,
     toCase = _require.toCase;
 
-var _require2 = require("../util/Helpers"),
+var _require2 = require("./util/Helpers"),
     notType = _require2.notType,
     escapeRegExp = _require2.escapeRegExp;
 

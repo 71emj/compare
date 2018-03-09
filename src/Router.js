@@ -1,8 +1,8 @@
 // @flow
 "use strict";
 const SwitchCase = require("./SwitchCase");
-const { Ended, toCase } = require("../util/CommonMethods");
-const { notType, escapeRegExp } = require("../util/Helpers");
+const { Ended, toCase } = require("./util/CommonMethods");
+const { notType, escapeRegExp } = require("./util/Helpers");
 
 function RouteController(simpleExp, config) {
   const self = new SwitchCase();

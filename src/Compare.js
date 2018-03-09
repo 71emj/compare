@@ -2,7 +2,7 @@
 "use strict";
 const Interface = require("./Interface");
 const Router = require("./Router");
-const { isType } = require("../util/Helpers");
+const { isType } = require("./util/Helpers");
 
 function Compare(config: {
 	limit: number,
