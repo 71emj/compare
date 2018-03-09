@@ -28,7 +28,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
   }
 
   // this is all the cases that can be easily matched with Compare
-  const cases = caseName => {
+  const cases = caseName => ({
     "1": [ dataViewTag, equal(object.byteLength, other.byteLength),
       equal(object.byteOffset, other.byteOffset)
     ],
@@ -38,7 +38,7 @@ function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
     "5": [ regexpTag, stringTag ],
     "6": [ setTag, mapTag ],
     "7": [ symbolTag ]
-  }[caseName];
+  }[caseName]);
 
   return (
     // now if there is no bug in this chain of evaluaion
