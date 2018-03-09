@@ -45,4 +45,19 @@ describe("this is a subset of Compare, designed to work as router", () => {
       router({ pathname: 10 })
     }).toThrow(TypeError);
   });
+
+  test("router can match path to many possible path", () => {
+    const random = Math.floor(Math.random() * 3);
+    const randomPath = [ pathname, home, "/api/user" ][random];
+
+    router({ path: randomPath })
+      .toPath("/user", false)
+      .toPath("/github/timjeng", "also false")
+      .toManyPath(["/github/71emj", "/", "/api/user"], true)
+      .toAllOther(404)
+      .Ended((debug, route) => {
+        debug();
+        expect(route).toBe(true)
+      });
+  });
 });

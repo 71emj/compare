@@ -33,11 +33,11 @@ function Compare() {
 		return {
 			"switch": function _switch() {
 				var switchCase = Interface(simpleExp, config);
-				return switchCase.setTargets(targetBody);
+				return switchCase._init(targetBody);
 			},
 			"router": function router() {
 				var router = Router(simpleExp, config);
-				return router.setTargets(targetBody);
+				return router._init(targetBody);
 			}
 		}[config.type]();
 	}

@@ -29,11 +29,11 @@ function Compare(config: {
 		return {
 			"switch": () => {
 				const switchCase = Interface(simpleExp, config);
-				return switchCase.setTargets(targetBody);
+				return switchCase._init(targetBody);
 			},
 			"router": () => {
 				const router = Router(simpleExp, config);
-				return router.setTargets(targetBody);
+				return router._init(targetBody);
 			}
 		}[config.type]();
 	}

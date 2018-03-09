@@ -26,3 +26,10 @@ export function matchExp(expr) {
   const simplePattern = /^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/;
   return expr.toString().match(simplePattern);
 }
+
+export function setPrivProp(obj, name, prop) {
+  return Object.defineProperty(obj, name, {
+      value: prop,
+      writable: false
+  });
+}
