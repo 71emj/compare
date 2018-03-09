@@ -1,10 +1,11 @@
 import InterfaceClosure from "../src/Interface";
 
 describe("transform Interface object to closure", () => {
-  let controller;
+  let controller, router;
 
   beforeAll(() => {
     controller = InterfaceClosure();
+    router = InterfaceClosure(true, { limit: 100, keywords: ["process"], router: true });
   });
 
   test("simple test with three matching methods, default, and Ended", () => {

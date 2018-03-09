@@ -1,4 +1,7 @@
 // @flow
+"use strict";
+const { isType, notType, swap, makeArray } = require("../util/Helpers");
+
 /** @constructor SwitchCase - process all evaluation logics
 * setTargets(...targets)
 * @param {[objects]} ...targets - bundle indefinite amount of objects into array
@@ -47,8 +50,8 @@ class SwitchCase {
     if (this.matched) {
       return this;
     }
-    [flag, fn] = arguments.length <= 3 ? [fn, null] : [flag, fn];
-    [vals, fn] = this._type(vals, "function") ? [null, vals] : [vals, fn];
+    [flag, fn] = arguments.length <= 3 ? swap(fn, null) : swap(flag, fn);
+    [vals, fn] = isType(vals, "function") ? swap(null, vals) : swap(vals, fn);
     this._evaluate(this._setClaim(exprs), flag) && this._break(vals, fn);
     return this;
   }
@@ -59,13 +62,13 @@ class SwitchCase {
   }
 
   _break(val, fn) {
-    this.result = this._type(fn, "function") ? fn(val) : val;
+    this.result = isType(fn, "function") ? fn(val) : val;
     return this.matched = true;
   }
 
   _setClaim(exprs) {
     const expToMap = (map, expr, index) => map.set(index, expr);
-    return this._isArray(exprs).reduce(expToMap, new Map());
+    return makeArray(exprs).reduce(expToMap, new Map());
   }
 
   _evaluate(claim, flag) {
@@ -73,8 +76,9 @@ class SwitchCase {
 
     const entry = new Map();
     const pushTo = (name, expr) => name.push(
-      this._type(expr, "function") ? "[Function]" : expr
+      isType(expr, "function") ? "[Function]" : expr
     );
+
     const outline = (claim, targets, pass = [], fail = []) => {
       claim.forEach(expr => this._matchExp(expr, targets) ? pushTo(pass, expr) : pushTo(fail, expr));
       fail.length && entry.set("fail", fail.join(" | "));
@@ -98,23 +102,15 @@ class SwitchCase {
     }
   }
 
-  _isArray(claim) {
-    return this._type(claim, "array") ? claim : [ claim ];
-  }
-
-  _type(target, type) {
-    return type === "array" ? Array.isArray(target) : typeof target === type;
-  }
-
   _filter(name, val) {
     return {
       "bad targets": target => {
-        if (!target || !this._type(target, "object")) {
+        if (!target || notType(target, "object")) {
           throw new TypeError("TestTargets cannot be null or undefined");
         }
       },
       "bad expression": exprs => {
-        const check = elem => this._type(exprs, elem);
+        const check = elem => isType(exprs, elem);
         if (!["boolean", "string", "function", "array"].filter(check)[0]) {
           throw new TypeError("An expression must be a string, array of string, or a function");
         }
@@ -125,10 +121,10 @@ class SwitchCase {
         }
       },
       "bad syntax": expr => {
-        if (this._type(expr, "function")) {
+        if (isType(expr, "function")) {
           return true;
         }
-        if (this._type(expr, "boolean")) {
+        if (isType(expr, "boolean")) {
           return false;
         }
         if (expr.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
