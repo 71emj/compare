@@ -4,12 +4,13 @@
 
 Compare is a zero-dependency library that evaluates complex case matching. Compare have features supporting evaluations made by passing expression in the form of string, array, and function as "case(s)" as well as end-of-evaluation callback and optional callback in individual cases.
 
-<strong>patch note 1.3.0 - 1.3.6</strong>
+<strong>patch note 1.3.0 - 1.3.8</strong>
 * Debug now display all evaluated cases, see [debug](#debug).
 * Support Boolean as expression, see [Mixing Type](#mixing-expression-type).
 * Interface now a closure instead of child class to SwitchCase.
 * Bug fix on Compare not throwing error when using simple expression with multiple targets.
 * Bug fix on uncaught error caused by passing non-object variable wrapped in an array.
+* Fix bug module not properly transpiled into es5. (I made a mistake with my build script)
 
 <strong>friendly note: </strong>this is still an early version of the library, it is highly recommended not to use it in a production environment. If you like the idea behind this library, please help making it better.
 

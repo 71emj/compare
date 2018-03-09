@@ -1,3 +1,11 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.toCase = toCase;
+exports.toAllOther = toAllOther;
+exports.Ended = Ended;
 /** Common methods are factories
 * // still need a lot of tweeking...
 * // but atm works as a shared library for both interface
@@ -16,7 +24,7 @@
 * @param {function} fn - callback function
 */
 
-export function toCase(self, flag, interpret) {
+function toCase(self, flag, interpret) {
   interpret = interpret || function (exprs) {
     return exprs;
   };
@@ -26,14 +34,14 @@ export function toCase(self, flag, interpret) {
   };
 }
 
-export function toAllOther(self) {
+function toAllOther(self) {
   return function (vals, fn) {
     self.match(true, vals, fn, "SIMPLE");
     return this;
   };
 }
 
-export function Ended(self, debug) {
+function Ended(self, debug) {
   debug = debug || function (opts) {
     var targets = opts ? self.testTargets[opts] : self.testTargets;
     console.log({ targets: targets, cases: self.history });
