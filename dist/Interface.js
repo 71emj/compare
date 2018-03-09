@@ -1,10 +1,21 @@
+"use strict";
+
 var SwitchCase = require("./SwitchCase");
 
-function InterfaceClosure(simpleExp, config) {
-  "use strict";
+var _require = require("../util/CommonMethods"),
+    Ended = _require.Ended,
+    toCase = _require.toCase;
 
+var _require2 = require("../util/Helpers"),
+    isType = _require2.isType,
+    notType = _require2.notType,
+    makeArray = _require2.makeArray,
+    matchExp = _require2.matchExp;
+
+function InterfaceClosure(simpleExp, config) {
   var self = new SwitchCase();
   var Interface = {};
+
   var securityConfig = {
     limit: 50,
     keywords: ["document", "window", "process"]
@@ -21,31 +32,27 @@ function InterfaceClosure(simpleExp, config) {
   * interpret
   * @param {array || string} expr - interface to verbose + filter
   */
-  var debug = function debug(opts) {
-    var targets = opts ? self.testTargets[opts] : self.testTargets;
-    console.log({ targets: targets, cases: self.history });
-  };
   var filter = function filter(exprs) {
     var pattern = rules.keywords.join("|") + "|.{" + rules.limit + ",}";
     var regexp = new RegExp(pattern);
     var testing = function testing(elem) {
-      return !self._type(elem, "function") && regexp.test(elem) ? true : false;
+      return notType(elem, "function") && regexp.test(elem) ? true : false;
     };
     return !!exprs.filter(testing)[0];
   };
   var verbose = function verbose(exprs) {
-    if (self._type(exprs, "function")) {
+    if (isType(exprs, "function")) {
       return exprs;
     }
     var name = self.testTargets.args[0];
     var mapping = function mapping(expr) {
-      var simple = expr.toString().match(/^\b([\w]+)\b$|^(!{0,1}[><=]={0,2})([\s.\w]+)$/);
-      return simple && !self._type(expr, "boolean") ? name + " " + (simple[2] || (+expr ? "==" : "===")) + " \"" + (simple[1] || simple[3]) + "\"" : expr;
-    }; // mathcing in sequence of "value", "operator", "following value"
+      var simple = matchExp(expr);
+      return !simple ? expr : name + " " + (simple[2] || (+expr ? "==" : "===")) + " \"" + (simple[1] || simple[3]) + "\"";
+    };
     return exprs.map(mapping);
   };
   var interpret = function interpret(expr) {
-    var exprs = self._isArray(expr);
+    var exprs = makeArray(expr);
     if (filter(exprs)) {
       throw new Error("individual expression must not exceed more than " + rules.limit + " characters " + ("and must not contain keywords such as " + rules.keywords.join(", ") + " etc."));
     }
@@ -70,22 +77,14 @@ function InterfaceClosure(simpleExp, config) {
   * Ended
   * @param {function} fn - callback function
   */
+
   var setTargets = function setTargets(target) {
     self.setTargets(target);
     return this;
   };
-  var toCase = function toCase(flag) {
-    return function (exprs, vals, fn) {
-      self.match(interpret(exprs), vals, fn, flag);
-      return this;
-    };
-  };
   var toAllOther = function toAllOther(vals, fn) {
     self.match(true, vals, fn, "SIMPLE");
     return this;
-  };
-  var Ended = function Ended(fn) {
-    return fn(debug, self.result);
   };
 
   Object.defineProperty(Interface, "setTargets", {
@@ -93,11 +92,11 @@ function InterfaceClosure(simpleExp, config) {
     writable: false
   });
 
-  Interface.toCase = toCase("SIMPLE");
-  Interface.toCaseOR = toCase("OR");
-  Interface.toCaseAND = toCase("AND");
+  Interface.toCase = toCase(self, "SIMPLE", interpret);
+  Interface.toCaseOR = toCase(self, "OR", interpret);
+  Interface.toCaseAND = toCase(self, "AND", interpret);
   Interface.toAllOther = toAllOther;
-  Interface.Ended = Ended;
+  Interface.Ended = Ended(self);
 
   return Interface;
 }

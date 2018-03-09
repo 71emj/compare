@@ -1,4 +1,4 @@
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+"use strict";
 
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
@@ -7,6 +7,12 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var _require = require("../util/Helpers"),
+    isType = _require.isType,
+    notType = _require.notType,
+    swap = _require.swap,
+    makeArray = _require.makeArray;
 
 /** @constructor SwitchCase - process all evaluation logics
 * setTargets(...targets)
@@ -17,6 +23,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 * @param {function} fn - an optionale callback
 * @param {string} flag - which type of matching user wish to perform
 */
+
+
 var SwitchCase = function () {
   function SwitchCase() {
     _classCallCheck(this, SwitchCase);
@@ -45,14 +53,14 @@ var SwitchCase = function () {
         return this;
       }
 
-      var _ref = arguments.length <= 3 ? [fn, null] : [flag, fn];
+      var _ref = arguments.length <= 3 ? swap(fn, null) : swap(flag, fn);
 
       var _ref2 = _slicedToArray(_ref, 2);
 
       flag = _ref2[0];
       fn = _ref2[1];
 
-      var _ref3 = this._type(vals, "function") ? [null, vals] : [vals, fn];
+      var _ref3 = isType(vals, "function") ? swap(null, vals) : swap(vals, fn);
 
       var _ref4 = _slicedToArray(_ref3, 2);
 
@@ -75,7 +83,7 @@ var SwitchCase = function () {
   }, {
     key: "_break",
     value: function _break(val, fn) {
-      this.result = this._type(fn, "function") ? fn(val) : val;
+      this.result = isType(fn, "function") ? fn(val) : val;
       return this.matched = true;
     }
   }, {
@@ -84,7 +92,7 @@ var SwitchCase = function () {
       var expToMap = function expToMap(map, expr, index) {
         return map.set(index, expr);
       };
-      return this._isArray(exprs).reduce(expToMap, new Map());
+      return makeArray(exprs).reduce(expToMap, new Map());
     }
   }, {
     key: "_evaluate",
@@ -95,8 +103,9 @@ var SwitchCase = function () {
 
       var entry = new Map();
       var pushTo = function pushTo(name, expr) {
-        return name.push(_this2._type(expr, "function") ? "[Function]" : expr);
+        return name.push(isType(expr, "function") ? "[Function]" : expr);
       };
+
       var outline = function outline(claim, targets) {
         var pass = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
         var fail = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
@@ -136,29 +145,17 @@ var SwitchCase = function () {
       }
     }
   }, {
-    key: "_isArray",
-    value: function _isArray(claim) {
-      return this._type(claim, "array") ? claim : [claim];
-    }
-  }, {
-    key: "_type",
-    value: function _type(target, type) {
-      return type === "array" ? Array.isArray(target) : (typeof target === "undefined" ? "undefined" : _typeof(target)) === type;
-    }
-  }, {
     key: "_filter",
     value: function _filter(name, val) {
-      var _this3 = this;
-
       return {
         "bad targets": function badTargets(target) {
-          if (!target || !_this3._type(target, "object")) {
+          if (!target || notType(target, "object")) {
             throw new TypeError("TestTargets cannot be null or undefined");
           }
         },
         "bad expression": function badExpression(exprs) {
           var check = function check(elem) {
-            return _this3._type(exprs, elem);
+            return isType(exprs, elem);
           };
           if (!["boolean", "string", "function", "array"].filter(check)[0]) {
             throw new TypeError("An expression must be a string, array of string, or a function");
@@ -170,10 +167,10 @@ var SwitchCase = function () {
           }
         },
         "bad syntax": function badSyntax(expr) {
-          if (_this3._type(expr, "function")) {
+          if (isType(expr, "function")) {
             return true;
           }
-          if (_this3._type(expr, "boolean")) {
+          if (isType(expr, "boolean")) {
             return false;
           }
           if (expr.match(/[\w]+\s*(?=\(.*\)|\([^-+*%/]+\))|{.+}|.+;.+/)) {
